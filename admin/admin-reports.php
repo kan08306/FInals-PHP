@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Reports';
 $current_page = 'admin';
 $base_path = '../';
@@ -25,6 +26,7 @@ $participation_report = admin_report_fetch_event_participation($conn, $event_fil
 $attendance_summary = admin_report_fetch_attendance_summary($conn, $event_filter, $date_filter);
 $attendance_records = admin_report_fetch_attendance_records($conn, $event_filter, $date_filter, $attendance_filter);
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -236,3 +238,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

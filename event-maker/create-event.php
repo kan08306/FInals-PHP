@@ -1,4 +1,5 @@
 <?php
+// Event Creation Page Setup
 $page_title = 'Shenanovents | Create Event';
 $current_page = 'events';
 $body_class = 'create-event-body';
@@ -13,6 +14,7 @@ $user = participant_fetch_profile($conn, $participant_id);
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Participant account was not found.';
+// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -49,6 +51,7 @@ $location_required_attr = (!$is_review_mode || $location_can_update) ? ' require
 $details_locked_attr = $is_review_mode ? ' disabled' : '';
 $publish_locked_attr = $is_review_mode ? ' disabled' : '';
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form_action = $_POST['form_action'] ?? 'create_event';
     $result = ['success' => false, 'errors' => ['Invalid form action.'], 'event_id' => 0];
@@ -74,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_errors = $result['errors'];
 }
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -402,3 +406,7 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+

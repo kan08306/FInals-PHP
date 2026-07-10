@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Edit Admin Profile';
 $current_page = 'admin';
 $base_path = '../';
@@ -12,6 +13,7 @@ $user = participant_fetch_profile($conn, $admin_id, 'admin');
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Admin account was not found.';
+// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -24,6 +26,7 @@ $first_name = $user['first_name'];
 $last_name = $user['last_name'];
 $email = $user['email'];
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form_action = $_POST['form_action'] ?? 'update_profile';
 
@@ -56,6 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -165,3 +169,7 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+

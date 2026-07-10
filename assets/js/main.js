@@ -85,6 +85,7 @@ const authRequiredMessage = document.querySelector('[data-auth-required-message]
 const registrationModal = document.querySelector('[data-registration-modal]');
 const privateEventOpenButtons = document.querySelectorAll('[data-private-event-open]');
 const privateEventModal = document.querySelector('[data-private-event-modal]');
+// Modal Element References
 const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
 const registrationForm = document.querySelector('[data-registration-form]');
 const registrationSuccess = document.querySelector('[data-registration-success]');
@@ -518,6 +519,7 @@ function updatePublishSummary() {
     const summaryLocation = document.querySelector('[data-summary-location]');
     const summaryDescription = document.querySelector('[data-summary-description]');
     const eventTitle = getWizardValue('[data-event-name]');
+// Event Data Collection
     const eventSummary = getWizardValue('[data-event-summary]');
     const eventDate = buildEventDateText();
     const eventTime = buildEventTimeText();
@@ -1568,7 +1570,7 @@ document.querySelectorAll('[data-attendance-toggle]').forEach((button) => {
         button.setAttribute('aria-pressed', isVisible ? 'false' : 'true');
 
         if (value) {
-            value.textContent = isVisible ? '••••••••••••' : (button.dataset.attendanceCode || 'No code');
+            value.textContent = isVisible ? 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' : (button.dataset.attendanceCode || 'No code');
         }
     });
 });
@@ -1821,6 +1823,7 @@ if (bannerDropzone) {
     });
 }
 
+// Page Interaction Bootstrap
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         closeActiveModal();
@@ -1839,6 +1842,7 @@ locationModeButtons.forEach((button) => {
 
         if (button.hasAttribute('data-location-filter')) {
             activeLocationFilter = button.getAttribute('data-location-filter') || 'all';
+// Filtering Interaction Logic
             filterEvents();
         }
 
@@ -2151,3 +2155,7 @@ document.addEventListener('click', (event) => {
         profileToggle?.setAttribute('aria-expanded', 'false');
     }
 });
+
+
+
+

@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | My Events';
 $current_page = 'dashboard';
 $base_path = '../';
@@ -14,6 +15,7 @@ $events = $pagination['items'];
 $success_message = participant_get_flash('success');
 $error_message = participant_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -112,3 +114,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

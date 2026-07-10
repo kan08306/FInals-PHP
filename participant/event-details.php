@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | Event Details';
 $current_page = 'events';
 $base_path = '../';
@@ -19,6 +20,7 @@ if ($event) {
     $page_title = 'Shenanovents | ' . $event['event_title'];
 }
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -105,3 +107,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

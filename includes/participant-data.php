@@ -1,24 +1,21 @@
 <?php
+// Session and Database Setup
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 
+// Participant Session Helper
 function participant_current_user_id()
 {
     return (int) ($_SESSION['user_id'] ?? 0);
 }
 
-function participant_user_has_private_event_access($event_id)
-{
-    $event_id = (int) $event_id;
-
-    return $event_id > 0 && !empty($_SESSION['private_event_access'][$event_id]);
-}
-
+// Flash Message Storage
 function participant_flash($type, $message)
 {
     $_SESSION['participant_' . $type] = $message;
 }
 
+// Flash Message Retrieval
 function participant_get_flash($type)
 {
     $key = 'participant_' . $type;
@@ -28,6 +25,7 @@ function participant_get_flash($type)
     return $message;
 }
 
+// Redirect Helper
 function participant_redirect_back($fallback = 'events.php')
 {
     $redirect_url = $_SERVER['REQUEST_URI'] ?? $fallback;
@@ -35,6 +33,7 @@ function participant_redirect_back($fallback = 'events.php')
     exit;
 }
 
+// Event Date and Time Formatting
 function participant_format_event_date_time($date, $time)
 {
     $event_timestamp = strtotime($date . ' ' . $time);
@@ -50,7 +49,7 @@ function participant_format_date($date)
 {
     $timestamp = strtotime($date);
 
-    return $timestamp ? date('m/d/Y', $timestamp) : 'N/A';
+    return $timestamp ? date('M j, Y', $timestamp) : 'N/A';
 }
 
 function participant_format_time($time)
@@ -77,11 +76,14 @@ function participant_time_filter($date)
     return $day_of_week >= 6 ? 'weekend' : 'all';
 }
 
+// Decide which event statuses are visible and joinable to participants.
+// Event Availability Rules
 function participant_event_is_available($status)
 {
     return in_array(strtolower($status), ['open', 'published', 'approved', 'active'], true);
 }
 
+// Respect scheduled publishing so events appear only after their publish date and time.
 function participant_event_publish_is_active($event)
 {
     $publish_date = trim((string) ($event['publish_date'] ?? ''));
@@ -112,6 +114,30 @@ function participant_event_has_ended($event)
     return $event_timestamp ? $event_timestamp < time() : false;
 }
 
+// Private Event Access Storage
+function participant_grant_private_event_access($event_id)
+{
+    $event_id = (int) $event_id;
+
+    if ($event_id <= 0) {
+        return;
+    }
+
+    if (!isset($_SESSION['private_event_access']) || !is_array($_SESSION['private_event_access'])) {
+        $_SESSION['private_event_access'] = [];
+    }
+
+    $_SESSION['private_event_access'][(string) $event_id] = true;
+}
+
+function participant_user_has_private_event_access($event_id)
+{
+    $event_id = (int) $event_id;
+
+    return $event_id > 0 && !empty($_SESSION['private_event_access'][(string) $event_id]);
+}
+
+// Enforce participant visibility rules for private, unpublished, and owned events.
 function participant_user_can_view_event($event, $user_id)
 {
     $user_id = (int) $user_id;
@@ -138,6 +164,7 @@ function participant_user_can_view_event($event, $user_id)
     return true;
 }
 
+// Confirm that an event is available, published, not ended, and visible before registration.
 function participant_event_registration_is_open($event, $user_id)
 {
     return participant_event_is_available($event['status'] ?? '')
@@ -146,6 +173,7 @@ function participant_event_registration_is_open($event, $user_id)
         && participant_user_can_view_event($event, $user_id);
 }
 
+// Attendance Code Lookup
 function participant_attendance_code_exists($conn, $attendance_code)
 {
     $sql = 'SELECT registration_id FROM registrations WHERE attendance_code = ? LIMIT 1';
@@ -164,6 +192,155 @@ function participant_attendance_code_exists($conn, $attendance_code)
     return $exists;
 }
 
+function participant_normalize_private_event_key($key)
+{
+    return strtoupper(preg_replace('/\s+/', '', trim((string) $key)));
+}
+
+function participant_private_event_key_exists($conn, $private_key)
+{
+    $sql = 'SELECT event_id FROM events WHERE private_access_key = ? LIMIT 1';
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        return true;
+    }
+
+    mysqli_stmt_bind_param($stmt, 's', $private_key);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_store_result($stmt);
+    $exists = mysqli_stmt_num_rows($stmt) > 0;
+    mysqli_stmt_close($stmt);
+
+    return $exists;
+}
+
+// Private Event Key Generation
+function participant_generate_private_event_key($conn)
+{
+    $characters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    $character_count = strlen($characters);
+
+    for ($attempt = 0; $attempt < 10; $attempt++) {
+        $code = '';
+
+        for ($index = 0; $index < 8; $index++) {
+            $code .= $characters[random_int(0, $character_count - 1)];
+        }
+
+        $private_key = 'PRV-' . $code;
+
+        if (!participant_private_event_key_exists($conn, $private_key)) {
+            return $private_key;
+        }
+    }
+
+    return 'PRV-' . strtoupper(substr(bin2hex(random_bytes(4)), 0, 8));
+}
+
+// Private Event Key Validation
+function participant_validate_private_event_key($conn, $user_id, $private_key)
+{
+    $private_key = participant_normalize_private_event_key($private_key);
+
+    if ($private_key === '') {
+        return ['success' => false, 'message' => 'Enter a private event key.', 'event_id' => 0];
+    }
+
+    $event_fields = participant_event_select_fields('e');
+    $sql = 'SELECT ' . $event_fields . ',
+                   organizer.first_name AS organizer_first_name,
+                   organizer.last_name AS organizer_last_name,
+                   (SELECT COALESCE(SUM(active_reg.attendee_count), 0)
+                    FROM registrations active_reg
+                    WHERE active_reg.event_id = e.event_id
+                    AND active_reg.registration_status = "registered") AS registered_count,
+                   current_registration.registration_id,
+                   current_registration.registration_status AS current_user_registration_status,
+                   current_registration.attendance_code,
+                   current_registration.attendance_status,
+                   current_registration.attendance_marked_at,
+                   EXISTS(
+                    SELECT 1
+                    FROM liked_events liked
+                    WHERE liked.event_id = e.event_id
+                    AND liked.user_id = ?
+                   ) AS current_user_liked
+            FROM events e
+            INNER JOIN users organizer ON organizer.user_id = e.created_by
+            LEFT JOIN registrations current_registration
+                ON current_registration.event_id = e.event_id
+                AND current_registration.user_id = ?
+            WHERE e.private_access_key = ?
+            LIMIT 1';
+    $stmt = mysqli_prepare($conn, $sql);
+
+    if (!$stmt) {
+        return ['success' => false, 'message' => 'Unable to check the private event key.', 'event_id' => 0];
+    }
+
+    mysqli_stmt_bind_param($stmt, 'iis', $user_id, $user_id, $private_key);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $event = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+
+    if (!$event) {
+        return ['success' => false, 'message' => 'The private event key is invalid.', 'event_id' => 0];
+    }
+
+    $event = participant_normalize_event_row($event);
+
+    if (strtolower($event['visibility']) !== 'private') {
+        return ['success' => false, 'message' => 'This key is not connected to a private event.', 'event_id' => 0];
+    }
+
+    if (!participant_event_is_available($event['status'] ?? '')) {
+        return ['success' => false, 'message' => 'This private event is not available.', 'event_id' => 0];
+    }
+
+    if (!participant_event_publish_is_active($event)) {
+        return ['success' => false, 'message' => 'This private event is not published yet.', 'event_id' => 0];
+    }
+
+    if (participant_event_has_ended($event)) {
+        return ['success' => false, 'message' => 'This private event has already ended.', 'event_id' => 0];
+    }
+
+    // Allow this participant to view the matching private event after a valid key is entered.
+    participant_grant_private_event_access((int) $event['event_id']);
+
+    return [
+        'success' => true,
+        'message' => 'Private event key accepted. You can now view and register for the event.',
+        'event_id' => (int) $event['event_id'],
+    ];
+}
+
+// Private Event Key Form Handling
+function participant_handle_private_event_key_post($conn, $user_id)
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || ($_POST['participant_action'] ?? '') !== 'private_event_key') {
+        return;
+    }
+
+    // Validate the private event key before allowing access to the private event page.
+    $result = participant_validate_private_event_key($conn, $user_id, $_POST['private_event_key'] ?? '');
+
+    if ($result['success']) {
+        participant_flash('success', $result['message']);
+        header('Location: event-details.php?event=' . (int) $result['event_id']);
+        exit;
+    }
+
+    participant_flash('error', $result['message']);
+    participant_flash('private_event_error', $result['message']);
+    header('Location: profile.php#private-events');
+    exit;
+}
+
+// Generate a unique ticket attendance code for each successful registration.
+// Attendance Code Generation
 function participant_generate_attendance_code($conn)
 {
     $year = date('Y');
@@ -183,43 +360,6 @@ function participant_generate_attendance_code($conn)
     }
 
     return 'SHNV-' . $year . '-' . strtoupper(substr(md5(uniqid('', true)), 0, 6));
-}
-
-function participant_private_access_key_exists($conn, $private_access_key)
-{
-    $sql = 'SELECT event_id FROM events WHERE private_access_key = ? LIMIT 1';
-    $stmt = mysqli_prepare($conn, $sql);
-
-    if (!$stmt) {
-        return true;
-    }
-
-    mysqli_stmt_bind_param($stmt, 's', $private_access_key);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_store_result($stmt);
-    $exists = mysqli_stmt_num_rows($stmt) > 0;
-    mysqli_stmt_close($stmt);
-
-    return $exists;
-}
-
-function participant_generate_private_access_key($conn)
-{
-    for ($attempt = 0; $attempt < 10; $attempt++) {
-        try {
-            $random_part = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
-        } catch (Exception $exception) {
-            $random_part = strtoupper(substr(md5(uniqid((string) mt_rand(), true)), 0, 6));
-        }
-
-        $private_access_key = 'PRIVATE-SHNV-' . $random_part;
-
-        if (!participant_private_access_key_exists($conn, $private_access_key)) {
-            return $private_access_key;
-        }
-    }
-
-    return 'PRIVATE-SHNV-' . strtoupper(substr(md5(uniqid('', true)), 0, 6));
 }
 
 function participant_registration_success_message($event, $attendance_code, $is_restored = false)
@@ -255,6 +395,7 @@ function participant_event_location_type($location)
     return 'physical';
 }
 
+// Event Select Fields
 function participant_event_select_fields($alias = 'e')
 {
     $prefix = $alias . '.';
@@ -266,10 +407,11 @@ function participant_event_select_fields($alias = 'e')
         . $prefix . 'event_venue, ' . $prefix . 'online_link, ' . $prefix . 'online_platform, '
         . $prefix . 'event_date, ' . $prefix . 'event_time, ' . $prefix . 'event_end_time, '
         . $prefix . 'capacity, ' . $prefix . 'banner_image, ' . $prefix . 'visibility, '
-        . $prefix . 'audience, ' . $prefix . 'private_access_key, ' . $prefix . 'publish_date, ' . $prefix . 'publish_time, '
+        . $prefix . 'private_access_key, ' . $prefix . 'audience, ' . $prefix . 'publish_date, ' . $prefix . 'publish_time, '
         . $prefix . 'status, ' . $prefix . 'created_by, ' . $prefix . 'created_at';
 }
 
+// Event Banner Image Path
 function participant_event_banner_src($event, $base_path = '../')
 {
     $banner_image = trim((string) ($event['banner_image'] ?? ''));
@@ -281,6 +423,7 @@ function participant_event_banner_src($event, $base_path = '../')
     return $base_path . ltrim($banner_image, '/');
 }
 
+// Country and City Options
 function participant_country_city_options_map()
 {
     return [
@@ -586,6 +729,7 @@ function participant_destination_card_background($city, $base_path = '')
     return "linear-gradient(180deg, rgba(1, 68, 33, 0.10) 0%, rgba(1, 68, 33, 0.48) 100%), url('" . $image_path . "'), linear-gradient(135deg, rgba(244, 196, 48, 0.20), rgba(0, 107, 63, 0.16))";
 }
 
+// Event Image Rendering
 function participant_render_event_image($event, $base_path = '../')
 {
     $banner_src = participant_event_banner_src($event, $base_path);
@@ -622,6 +766,7 @@ function participant_event_type_label($event_type)
     return 'Venue Event';
 }
 
+// Profile Picture Path
 function participant_profile_picture_src($profile_picture, $base_path = '../')
 {
     $profile_picture = trim((string) $profile_picture);
@@ -640,6 +785,7 @@ function participant_profile_picture_src($profile_picture, $base_path = '../')
     return $base_path . $profile_picture;
 }
 
+// Profile Avatar Rendering
 function participant_render_profile_avatar($profile_picture, $base_path = '../')
 {
     $picture_src = participant_profile_picture_src($profile_picture, $base_path);
@@ -733,6 +879,7 @@ function participant_attendance_status_label($status)
     return ucwords(str_replace(['_', '-'], ' ', $status));
 }
 
+// Event Row Normalization
 function participant_normalize_event_row($row)
 {
     $capacity = (int) ($row['capacity'] ?? 0);
@@ -764,8 +911,8 @@ function participant_normalize_event_row($row)
     $row['event_summary'] = trim((string) ($row['event_summary'] ?? ''));
     $row['banner_image'] = trim((string) ($row['banner_image'] ?? ''));
     $row['visibility'] = trim((string) ($row['visibility'] ?? 'public'));
-    $row['audience'] = trim((string) ($row['audience'] ?? ''));
     $row['private_access_key'] = trim((string) ($row['private_access_key'] ?? ''));
+    $row['audience'] = trim((string) ($row['audience'] ?? ''));
     $row['status_badge'] = participant_event_badge($row['status'], $remaining_slots, $capacity);
     $row['registration_label'] = participant_registration_label($row);
     $row['organizer_name'] = trim(($row['organizer_first_name'] ?? '') . ' ' . ($row['organizer_last_name'] ?? ''));
@@ -779,6 +926,7 @@ function participant_normalize_event_row($row)
     return $row;
 }
 
+// Profile Retrieval
 function participant_fetch_profile($conn, $user_id, $role = 'participant')
 {
     $sql = 'SELECT user_id, first_name, last_name, email, role, status, profile_picture, created_at
@@ -800,6 +948,7 @@ function participant_fetch_profile($conn, $user_id, $role = 'participant')
     return $user ?: null;
 }
 
+// Event Filter Normalization
 function participant_normalize_event_filters($filters)
 {
     if (is_string($filters)) {
@@ -819,6 +968,7 @@ function participant_normalize_event_filters($filters)
     ];
 }
 
+// Event Filter SQL Builder
 function participant_event_filter_sql($filters, &$types, &$values, $alias = 'e')
 {
     $filters = participant_normalize_event_filters($filters);
@@ -905,6 +1055,7 @@ function participant_current_page($page_param = 'page')
     return max(1, (int) ($_GET[$page_param] ?? 1));
 }
 
+// Pagination Management
 function participant_paginate_items($items, $current_page, $per_page = 8)
 {
     $total_items = count($items);
@@ -994,6 +1145,8 @@ function participant_render_dashboard_pagination($path, $params, $current_page, 
     <?php
 }
 
+// Load published and available events for browsing with participant-specific status values.
+// Event Listing Retrieval
 function participant_fetch_events($conn, $user_id, $filters = [])
 {
     $events = [];
@@ -1007,11 +1160,11 @@ function participant_fetch_events($conn, $user_id, $filters = [])
                     FROM registrations active_reg
                     WHERE active_reg.event_id = e.event_id
                     AND active_reg.registration_status = "registered") AS registered_count,
-                   (SELECT user_reg.registration_status
-                    FROM registrations user_reg
-                    WHERE user_reg.event_id = e.event_id
-                    AND user_reg.user_id = ?
-                    LIMIT 1) AS current_user_registration_status,
+                   current_registration.registration_id,
+                   current_registration.registration_status AS current_user_registration_status,
+                   current_registration.attendance_code,
+                   current_registration.attendance_status,
+                   current_registration.attendance_marked_at,
                    EXISTS(
                     SELECT 1
                     FROM liked_events liked
@@ -1020,6 +1173,9 @@ function participant_fetch_events($conn, $user_id, $filters = [])
                    ) AS current_user_liked
             FROM events e
             INNER JOIN users organizer ON organizer.user_id = e.created_by
+            LEFT JOIN registrations current_registration
+                ON current_registration.event_id = e.event_id
+                AND current_registration.user_id = ?
             WHERE LOWER(e.status) IN ("open", "published", "approved", "active")';
 
     $sql .= participant_event_filter_sql($filters, $types, $values, 'e');
@@ -1047,6 +1203,7 @@ function participant_fetch_events($conn, $user_id, $filters = [])
     return $events;
 }
 
+// Landing Event Retrieval
 function participant_fetch_landing_events($conn, $limit = 8)
 {
     $events = participant_fetch_events($conn, 0, []);
@@ -1054,6 +1211,8 @@ function participant_fetch_landing_events($conn, $limit = 8)
     return array_slice($events, 0, max(1, (int) $limit));
 }
 
+// Load a single event only when the current participant is allowed to view it.
+// Event Details Retrieval
 function participant_fetch_event_details($conn, $user_id, $event_id)
 {
     $event_fields = participant_event_select_fields('e');
@@ -1064,11 +1223,11 @@ function participant_fetch_event_details($conn, $user_id, $event_id)
                     FROM registrations active_reg
                     WHERE active_reg.event_id = e.event_id
                     AND active_reg.registration_status = "registered") AS registered_count,
-                   (SELECT user_reg.registration_status
-                    FROM registrations user_reg
-                    WHERE user_reg.event_id = e.event_id
-                    AND user_reg.user_id = ?
-                    LIMIT 1) AS current_user_registration_status,
+                   current_registration.registration_id,
+                   current_registration.registration_status AS current_user_registration_status,
+                   current_registration.attendance_code,
+                   current_registration.attendance_status,
+                   current_registration.attendance_marked_at,
                    EXISTS(
                     SELECT 1
                     FROM liked_events liked
@@ -1077,6 +1236,9 @@ function participant_fetch_event_details($conn, $user_id, $event_id)
                    ) AS current_user_liked
             FROM events e
             INNER JOIN users organizer ON organizer.user_id = e.created_by
+            LEFT JOIN registrations current_registration
+                ON current_registration.event_id = e.event_id
+                AND current_registration.user_id = ?
             WHERE e.event_id = ?
             LIMIT 1';
     $stmt = mysqli_prepare($conn, $sql);
@@ -1100,60 +1262,8 @@ function participant_fetch_event_details($conn, $user_id, $event_id)
     return participant_user_can_view_event($event, $user_id) ? $event : null;
 }
 
-function participant_unlock_private_event($conn, $user_id, $private_event_code)
-{
-    $private_event_code = strtoupper(trim((string) $private_event_code));
-
-    if ($private_event_code === '') {
-        return ['success' => false, 'message' => 'Enter your private event code.', 'event_id' => 0];
-    }
-
-    $event_fields = participant_event_select_fields('e');
-    $sql = 'SELECT ' . $event_fields . ',
-                   organizer.first_name AS organizer_first_name,
-                   organizer.last_name AS organizer_last_name,
-                   (SELECT COALESCE(SUM(active_reg.attendee_count), 0)
-                    FROM registrations active_reg
-                    WHERE active_reg.event_id = e.event_id
-                    AND active_reg.registration_status = "registered") AS registered_count,
-                   (SELECT user_reg.registration_status
-                    FROM registrations user_reg
-                    WHERE user_reg.event_id = e.event_id
-                    AND user_reg.user_id = ?
-                    LIMIT 1) AS current_user_registration_status,
-                   0 AS current_user_liked
-            FROM events e
-            INNER JOIN users organizer ON organizer.user_id = e.created_by
-            WHERE e.private_access_key = ?
-            AND LOWER(e.visibility) = "private"
-            LIMIT 1';
-    $stmt = mysqli_prepare($conn, $sql);
-
-    if (!$stmt) {
-        return ['success' => false, 'message' => 'Unable to check the private event code.', 'event_id' => 0];
-    }
-
-    mysqli_stmt_bind_param($stmt, 'is', $user_id, $private_event_code);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $event = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    if (!$event) {
-        return ['success' => false, 'message' => 'Invalid private event code.', 'event_id' => 0];
-    }
-
-    $event = participant_normalize_event_row($event);
-
-    if (!participant_event_is_available($event['status'] ?? '') || !participant_event_publish_is_active($event) || participant_event_has_ended($event)) {
-        return ['success' => false, 'message' => 'This private event is not available anymore.', 'event_id' => 0];
-    }
-
-    $_SESSION['private_event_access'][(int) $event['event_id']] = true;
-
-    return ['success' => true, 'message' => 'Private event unlocked.', 'event_id' => (int) $event['event_id']];
-}
-
+// Load registered and cancelled events for the participant ticket workflow.
+// Registered Event Retrieval
 function participant_fetch_registered_events($conn, $user_id, $include_cancelled = true)
 {
     $events = [];
@@ -1204,6 +1314,7 @@ function participant_fetch_registered_events($conn, $user_id, $include_cancelled
     return $events;
 }
 
+// Hosted Event Retrieval
 function participant_fetch_hosted_events($conn, $user_id)
 {
     $events = [];
@@ -1244,6 +1355,8 @@ function participant_fetch_hosted_events($conn, $user_id)
     return $events;
 }
 
+// Load dashboard totals only for events owned by the current participant.
+// Owned Event Dashboard Retrieval
 function participant_fetch_owned_event_dashboard($conn, $user_id, $event_id)
 {
     $event_fields = participant_event_select_fields('e');
@@ -1310,6 +1423,7 @@ function participant_fetch_owned_event_dashboard($conn, $user_id, $event_id)
     return $event;
 }
 
+// Event Registration Chart Data
 function participant_fetch_event_registration_bars($conn, $user_id, $event_id)
 {
     $bars = [
@@ -1404,6 +1518,7 @@ function participant_build_event_dashboard_bars($event)
     return $bars;
 }
 
+// Owned Event Attendance Retrieval
 function participant_fetch_owned_event_attendance($conn, $user_id, $event_id)
 {
     $user_id = (int) $user_id;
@@ -1450,6 +1565,8 @@ function participant_fetch_owned_event_attendance($conn, $user_id, $event_id)
     return $participants;
 }
 
+// Keep the attendance audit table synchronized with the registration attendance status.
+// Attendance Record Synchronization
 function participant_sync_attendance_record($conn, $registration_id, $attendance_status, $marked_by)
 {
     $registration_id = (int) $registration_id;
@@ -1474,6 +1591,8 @@ function participant_sync_attendance_record($conn, $registration_id, $attendance
     return $success;
 }
 
+// Allow an event owner to mark attendance only for participants registered to their event.
+// Attendance Status Update
 function participant_mark_owned_registration_attendance($conn, $user_id, $registration_id, $attendance_status)
 {
     $user_id = (int) $user_id;
@@ -1532,6 +1651,8 @@ function participant_mark_owned_registration_attendance($conn, $user_id, $regist
     return ['success' => true, 'message' => 'Attendance marked as ' . participant_attendance_status_label($attendance_status) . '.'];
 }
 
+// Verify that an attendance code belongs to a pending registration for the owner's event.
+// Attendance Code Verification
 function participant_verify_owned_attendance_code($conn, $user_id, $event_id, $attendance_code)
 {
     $user_id = (int) $user_id;
@@ -1575,6 +1696,7 @@ function participant_verify_owned_attendance_code($conn, $user_id, $event_id, $a
     return participant_mark_owned_registration_attendance($conn, $user_id, (int) $registration['registration_id'], 'present');
 }
 
+// Attendance Finalization
 function participant_finalize_owned_event_attendance($conn, $user_id, $event_id)
 {
     $participants = participant_fetch_owned_event_attendance($conn, $user_id, $event_id);
@@ -1598,6 +1720,7 @@ function participant_finalize_owned_event_attendance($conn, $user_id, $event_id)
     ];
 }
 
+// Owned Event Status Update
 function participant_update_owned_event_status($conn, $user_id, $event_id, $status)
 {
     $allowed_statuses = ['closed', 'completed'];
@@ -1722,6 +1845,7 @@ function participant_prepare_event_location_update_data($form_data)
     ];
 }
 
+// Owned Event Location Update
 function participant_update_owned_event_location($conn, $user_id, $event_id, $form_data)
 {
     $event = participant_fetch_owned_event_dashboard($conn, $user_id, $event_id);
@@ -1785,6 +1909,7 @@ function participant_update_owned_event_location($conn, $user_id, $event_id, $fo
     return ['success' => true, 'errors' => []];
 }
 
+// Liked Event Retrieval
 function participant_fetch_liked_events($conn, $user_id)
 {
     $events = [];
@@ -1832,6 +1957,7 @@ function participant_count_liked_events($conn, $user_id)
     return count(participant_fetch_liked_events($conn, $user_id));
 }
 
+// Participant Summary Statistics
 function participant_fetch_registration_summary($conn, $user_id)
 {
     $summary = [
@@ -1903,6 +2029,7 @@ function participant_parse_event_date_for_database($date)
     return '';
 }
 
+// Event Banner Upload
 function participant_upload_event_banner($file, $is_required = false)
 {
     if (empty($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
@@ -1966,6 +2093,8 @@ function participant_upload_event_banner($file, $is_required = false)
     return ['success' => true, 'path' => 'assets/uploads/event-banners/' . $new_filename, 'errors' => []];
 }
 
+// Validate and normalize event creation data before saving it to the database.
+// Event Form Preparation
 function participant_prepare_event_form_data($form_data, $files = [])
 {
     $title = trim($form_data['event_name'] ?? '');
@@ -2136,7 +2265,6 @@ function participant_prepare_event_form_data($form_data, $files = [])
             'banner_image' => $banner_result['path'],
             'visibility' => $visibility,
             'audience' => $audience,
-            'private_access_key' => null,
             'publish_date' => $publish_date,
             'publish_time' => $publish_time,
             'status' => 'pending',
@@ -2144,6 +2272,8 @@ function participant_prepare_event_form_data($form_data, $files = [])
     ];
 }
 
+// Save a participant-created event as pending for administrator review.
+// Event Creation
 function participant_create_event($conn, $user_id, $form_data, $files = [])
 {
     $prepared_event = participant_prepare_event_form_data($form_data, $files);
@@ -2153,12 +2283,13 @@ function participant_create_event($conn, $user_id, $form_data, $files = [])
     }
 
     $event = $prepared_event['data'];
-    $event['private_access_key'] = $event['visibility'] === 'private' ? participant_generate_private_access_key($conn) : null;
+    // Generate a private access key only when the event visibility is private.
+    $private_access_key = $event['visibility'] === 'private' ? participant_generate_private_event_key($conn) : null;
     $sql = 'INSERT INTO events
             (event_title, event_summary, event_description, event_tags, event_category, event_type,
              event_location, event_country, event_province, event_city, event_address, event_venue,
              online_link, online_platform, event_date, event_time, event_end_time, capacity,
-             banner_image, visibility, audience, private_access_key, publish_date, publish_time, status, created_by)
+             banner_image, visibility, private_access_key, audience, publish_date, publish_time, status, created_by)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
     $stmt = mysqli_prepare($conn, $sql);
 
@@ -2189,8 +2320,8 @@ function participant_create_event($conn, $user_id, $form_data, $files = [])
         $event['capacity'],
         $event['banner_image'],
         $event['visibility'],
+        $private_access_key,
         $event['audience'],
-        $event['private_access_key'],
         $event['publish_date'],
         $event['publish_time'],
         $event['status'],
@@ -2208,6 +2339,8 @@ function participant_create_event($conn, $user_id, $form_data, $files = [])
     return ['success' => true, 'errors' => [], 'event_id' => (int) $event_id];
 }
 
+// Validate participant registration form data before capacity and duplicate checks.
+// Registration Form Preparation
 function participant_prepare_registration_form_data($form_data)
 {
     $full_name = trim($form_data['full_name'] ?? '');
@@ -2253,6 +2386,8 @@ function participant_prepare_registration_form_data($form_data)
     ];
 }
 
+// Register a participant while preventing duplicates, overbooking, and invalid events.
+// Event Registration
 function participant_register_for_event($conn, $user_id, $event_id, $form_data = [])
 {
     $prepared_form = participant_prepare_registration_form_data($form_data);
@@ -2435,6 +2570,8 @@ function participant_register_for_event($conn, $user_id, $event_id, $form_data =
     return ['success' => false, 'message' => 'Unable to complete registration.'];
 }
 
+// Cancel an active registration and clear its attendance record inside one transaction.
+// Registration Cancellation
 function participant_cancel_registration($conn, $user_id, $registration_id)
 {
     mysqli_begin_transaction($conn);
@@ -2476,6 +2613,8 @@ function participant_cancel_registration($conn, $user_id, $registration_id)
     return ['success' => false, 'message' => 'Only your active registrations can be cancelled.'];
 }
 
+// Add or remove a participant's saved event without creating duplicate likes.
+// Like Toggle Management
 function participant_toggle_liked_event($conn, $user_id, $event_id)
 {
     $event = participant_fetch_event_details($conn, $user_id, $event_id);
@@ -2535,6 +2674,8 @@ function participant_toggle_liked_event($conn, $user_id, $event_id)
     ];
 }
 
+// Route participant post actions for registration, cancellation, and likes.
+// Participant Action Dispatcher
 function participant_handle_registration_post($conn)
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['participant_action'])) {
@@ -2566,6 +2707,8 @@ function participant_handle_registration_post($conn)
     }
 }
 
+// Validate and save profile picture uploads using safe generated filenames.
+// Profile Picture Upload
 function participant_upload_profile_picture($file, $current_picture = '')
 {
     if (empty($file) || ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
@@ -2625,6 +2768,8 @@ function participant_upload_profile_picture($file, $current_picture = '')
     return ['success' => true, 'path' => $new_path, 'errors' => []];
 }
 
+// Update a profile after checking required fields, duplicate email, and optional upload.
+// Profile Management
 function participant_update_profile($conn, $user_id, $first_name, $last_name, $email, $profile_picture_file = null, $role = 'participant')
 {
     $first_name = trim($first_name);
@@ -2697,6 +2842,8 @@ function participant_update_profile($conn, $user_id, $first_name, $last_name, $e
     return ['success' => true, 'errors' => []];
 }
 
+// Change a password only after verifying the current password and confirmation value.
+// Password Management
 function participant_change_password($conn, $user_id, $current_password, $new_password, $confirm_password, $role = 'participant')
 {
     $errors = [];
@@ -2754,6 +2901,7 @@ function participant_change_password($conn, $user_id, $current_password, $new_pa
     return ['success' => true, 'errors' => []];
 }
 
+// Event Card Actions
 function participant_render_like_button($event)
 {
     $event_id = (int) ($event['event_id'] ?? 0);
@@ -2808,6 +2956,26 @@ function participant_render_event_action($event, $mode = 'browse')
     <?php
 }
 
+function participant_render_attendance_code_toggle($event)
+{
+    $attendance_code = trim((string) ($event['attendance_code'] ?? ''));
+
+    if ($attendance_code === '' || ($event['current_user_registration_status'] ?? '') !== 'registered') {
+        return;
+    }
+
+    ?>
+    <div class="attendance-code-reveal" data-attendance-code-reveal>
+        <button class="button button-outline attendance-code-toggle" type="button" aria-expanded="false" data-attendance-code-toggle>
+            Show Attendance Code
+        </button>
+        <span class="attendance-code-value" data-attendance-code-value hidden>
+            <?php echo htmlspecialchars($attendance_code, ENT_QUOTES, 'UTF-8'); ?>
+        </span>
+    </div>
+    <?php
+}
+
 function participant_render_event_card($event, $mode = 'browse')
 {
     $event_id = (int) ($event['event_id'] ?? 0);
@@ -2822,7 +2990,7 @@ function participant_render_event_card($event, $mode = 'browse')
     $details_href = 'event-details.php?event=' . $event_id;
 
     if ($mode === 'registered') {
-        $registration_label = ucwords($event['registration_status'] ?? 'registered');
+        $registration_label = 'Status: ' . ucwords($event['registration_status'] ?? 'registered');
     }
     ?>
     <article class="event-card" role="link" tabindex="0" data-event-href="<?php echo htmlspecialchars($details_href, ENT_QUOTES, 'UTF-8'); ?>" data-event-filter="<?php echo htmlspecialchars($filter, ENT_QUOTES, 'UTF-8'); ?>" data-event-category="<?php echo htmlspecialchars($category, ENT_QUOTES, 'UTF-8'); ?>" data-event-location-type="<?php echo htmlspecialchars($location_type, ENT_QUOTES, 'UTF-8'); ?>" data-event-country="<?php echo htmlspecialchars($event['event_country'] ?? '', ENT_QUOTES, 'UTF-8'); ?>"<?php echo isset($event['registration_status']) ? ' data-registration-status="' . htmlspecialchars($event['registration_status'], ENT_QUOTES, 'UTF-8') . '"' : ''; ?> data-event-id="event-<?php echo $event_id; ?>" data-registration-event data-event-title="<?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?>" data-event-date-time="<?php echo htmlspecialchars($date_time, ENT_QUOTES, 'UTF-8'); ?>" data-event-location="<?php echo htmlspecialchars($location, ENT_QUOTES, 'UTF-8'); ?>">
@@ -2855,18 +3023,11 @@ function participant_render_event_card($event, $mode = 'browse')
                 <div class="event-ticket-meta">
                     <p class="event-registration-label"><?php echo htmlspecialchars($registration_label, ENT_QUOTES, 'UTF-8'); ?></p>
                     <?php if ($mode === 'registered' && !empty($event['attendance_code'])): ?>
-                        <small>Attendance</small>
+                        <small>Attendance Code hidden until details view</small>
+                        <small>Attendance: <?php echo htmlspecialchars($event['attendance_status_label'] ?? 'Pending', ENT_QUOTES, 'UTF-8'); ?></small>
                     <?php endif; ?>
                 </div>
-                <div class="event-card-actions<?php echo $mode === 'registered' && !empty($event['attendance_code']) ? ' event-card-actions-stacked' : ''; ?>">
-                    <?php participant_render_event_action($event, $mode); ?>
-                    <?php if ($mode === 'registered' && !empty($event['attendance_code'])): ?>
-                        <button class="event-register attendance-key-toggle" type="button" data-attendance-toggle data-attendance-code="<?php echo htmlspecialchars($event['attendance_code'], ENT_QUOTES, 'UTF-8'); ?>" aria-pressed="false">
-                            <span>Key</span>
-                            <strong data-attendance-value>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</strong>
-                        </button>
-                    <?php endif; ?>
-                </div>
+                <?php participant_render_event_action($event, $mode); ?>
             </div>
         </div>
     </article>

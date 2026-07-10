@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | User Profile';
 $current_page = 'events';
 $base_path = '../';
@@ -12,6 +13,7 @@ $user = participant_fetch_profile($conn, $participant_id);
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Participant account was not found.';
+// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -45,6 +47,7 @@ $statistics = [
     ['icon' => 'icon-heart', 'label' => 'Cancelled Events', 'total' => $summary['cancelled']],
 ];
 
+// R En De R P Ro Fi Le E Ve Nt C Ar D
 function render_profile_event_card($event, $label, $action, $href)
 {
     $event['registration_label'] = $label;
@@ -85,6 +88,7 @@ function render_profile_event_card($event, $label, $action, $href)
     <?php
 }
 
+// R En De R P Ro Fi Le E Mp Ty S Ta Te
 function render_profile_empty_state($message)
 {
     ?>
@@ -96,6 +100,7 @@ function render_profile_empty_state($message)
     <?php
 }
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -246,3 +251,7 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+

@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $current_page = 'events';
 $base_path = '../';
 $asset_version = 'participant-module-update';
@@ -38,6 +39,7 @@ if (!in_array($selected_city, $popular_cities, true)) {
 }
 
 require_once __DIR__ . '/../includes/countries.php';
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -112,3 +114,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

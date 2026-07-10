@@ -1,8 +1,10 @@
 <?php
+// Shared Include Setup
 require_once __DIR__ . '/auth-check.php';
 
 if (($_SESSION['user_role'] ?? '') !== 'participant') {
     if (($_SESSION['user_role'] ?? '') === 'admin') {
+// Redirect Handling
         header('Location: ../admin/admin-dashboard.php');
         exit;
     }
@@ -11,3 +13,6 @@ if (($_SESSION['user_role'] ?? '') !== 'participant') {
     header('Location: ../auth/signin.php');
     exit;
 }
+
+
+

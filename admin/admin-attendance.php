@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Attendance';
 $current_page = 'admin';
 $base_path = '../';
@@ -38,6 +39,7 @@ $attendance_records = admin_attendance_fetch_records($conn, $event_filter, $atte
 $success_message = admin_attendance_get_flash('success');
 $error_message = admin_attendance_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -247,3 +249,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

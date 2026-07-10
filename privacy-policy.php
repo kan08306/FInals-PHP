@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | Privacy Policy';
 $current_page = 'home';
 $info_kicker = 'Company';
@@ -18,3 +19,5 @@ $info_sections = [
 $info_cta = ['title' => 'Questions about privacy?', 'body' => 'Send a support request if you need clarification about account or event data handling.', 'label' => 'Contact Support', 'href' => 'contact-support.php'];
 
 require_once 'includes/info-page-template.php';
+
+

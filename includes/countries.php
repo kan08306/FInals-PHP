@@ -1,4 +1,5 @@
 <?php
+// Shared Include Setup
 $countries = [
     'Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola', 'Antigua and Barbuda', 'Argentina',
     'Armenia', 'Australia', 'Austria', 'Azerbaijan', 'Bahamas', 'Bahrain', 'Bangladesh',
@@ -31,3 +32,5 @@ $countries = [
     'Uzbekistan', 'Vanuatu', 'Vatican City', 'Venezuela', 'Vietnam', 'Yemen', 'Zambia',
     'Zimbabwe',
 ];
+
+

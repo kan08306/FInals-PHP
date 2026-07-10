@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | Terms of Service';
 $current_page = 'home';
 $info_kicker = 'Company';
@@ -18,3 +19,5 @@ $info_sections = [
 $info_cta = ['title' => 'Need help understanding a rule?', 'body' => 'Contact support for questions about account, event, or organizer responsibilities.', 'label' => 'Contact Support', 'href' => 'contact-support.php'];
 
 require_once 'includes/info-page-template.php';
+
+

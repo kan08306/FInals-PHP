@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Manage Events';
 $current_page = 'admin';
 $base_path = '../';
@@ -14,6 +15,7 @@ $admin_total_pages = max(1, (int) ceil(count($events) / $admin_page_size));
 $success_message = admin_event_get_flash('success');
 $error_message = admin_event_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -481,3 +483,5 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

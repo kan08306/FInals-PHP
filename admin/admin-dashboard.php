@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Admin Dashboard';
 $current_page = 'admin';
 $base_path = '../';
@@ -51,6 +52,7 @@ $summary_cards = [
     ],
 ];
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -169,3 +171,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

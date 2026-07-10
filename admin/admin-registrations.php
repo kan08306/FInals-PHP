@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Manage Registrations';
 $current_page = 'admin';
 $base_path = '../';
@@ -33,6 +34,7 @@ $registrations = admin_registration_fetch_registrations($conn, $event_filter, $s
 $success_message = admin_registration_get_flash('success');
 $error_message = admin_registration_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -195,3 +197,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

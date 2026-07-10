@@ -1,9 +1,11 @@
 <?php
+// Shared Include Setup
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 require_once __DIR__ . '/admin-event-data.php';
 require_once __DIR__ . '/admin-user-data.php';
 
+// A Dm In R Eg Is Tr At Io N S Ta Tu S O Pt Io Ns
 function admin_registration_status_options()
 {
     return [
@@ -12,11 +14,13 @@ function admin_registration_status_options()
     ];
 }
 
+// A Dm In R Eg Is Tr At Io N F La Sh
 function admin_registration_flash($type, $message)
 {
     $_SESSION['admin_registration_' . $type] = $message;
 }
 
+// A Dm In R Eg Is Tr At Io N G Et F La Sh
 function admin_registration_get_flash($type)
 {
     $key = 'admin_registration_' . $type;
@@ -26,6 +30,7 @@ function admin_registration_get_flash($type)
     return $message;
 }
 
+// A Dm In R Eg Is Tr At Io N L Ab El
 function admin_registration_label($value)
 {
     $value = trim((string) $value);
@@ -37,6 +42,7 @@ function admin_registration_label($value)
     return ucwords(str_replace(['_', '-'], ' ', strtolower($value)));
 }
 
+// A Dm In R Eg Is Tr At Io N C Ou Nt
 function admin_registration_count($conn, $sql)
 {
     $result = mysqli_query($conn, $sql);
@@ -50,6 +56,7 @@ function admin_registration_count($conn, $sql)
     return (int) ($row['total'] ?? 0);
 }
 
+// A Dm In R Eg Is Tr At Io N F Et Ch E Ve Nt O Pt Io Ns
 function admin_registration_fetch_event_options($conn)
 {
     $events = [];
@@ -69,6 +76,7 @@ function admin_registration_fetch_event_options($conn)
     return $events;
 }
 
+// A Dm In R Eg Is Tr At Io N F Et Ch S Um Ma Ry
 function admin_registration_fetch_summary($conn)
 {
     return [
@@ -78,6 +86,7 @@ function admin_registration_fetch_summary($conn)
     ];
 }
 
+// A Dm In R Eg Is Tr At Io N F Et Ch R Eg Is Tr At Io Ns
 function admin_registration_fetch_registrations($conn, $event_id = 0, $status_filter = '')
 {
     $event_id = (int) $event_id;
@@ -141,6 +150,7 @@ function admin_registration_fetch_registrations($conn, $event_id = 0, $status_fi
     return $registrations;
 }
 
+// A Dm In R Eg Is Tr At Io N F Et Ch R Eg Is Tr At Io N B Y I D
 function admin_registration_fetch_registration_by_id($conn, $registration_id)
 {
     $registration_id = (int) $registration_id;
@@ -150,6 +160,7 @@ function admin_registration_fetch_registration_by_id($conn, $registration_id)
             INNER JOIN events e ON e.event_id = r.event_id
             WHERE r.registration_id = ?
             LIMIT 1';
+// Prepared Statement Setup
     $stmt = mysqli_prepare($conn, $sql);
 
     if (!$stmt) {
@@ -165,6 +176,7 @@ function admin_registration_fetch_registration_by_id($conn, $registration_id)
     return $registration ?: null;
 }
 
+// A Dm In R Eg Is Tr At Io N C An R Es To Re
 function admin_registration_can_restore($conn, $registration)
 {
     $event_id = (int) ($registration['event_id'] ?? 0);
@@ -193,6 +205,7 @@ function admin_registration_can_restore($conn, $registration)
     return ($active_attendees + $attendee_count) <= $capacity;
 }
 
+// A Dm In R Eg Is Tr At Io N U Pd At E S Ta Tu S
 function admin_registration_update_status($conn, $registration_id, $status)
 {
     $registration_id = (int) $registration_id;
@@ -270,8 +283,10 @@ function admin_registration_update_status($conn, $registration_id, $status)
     ];
 }
 
+// A Dm In R Eg Is Tr At Io N H An Dl E P Os T
 function admin_registration_handle_post($conn, $redirect_path)
 {
+// Form Submission Handling
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['admin_registration_action'])) {
         return;
     }
@@ -287,6 +302,12 @@ function admin_registration_handle_post($conn, $redirect_path)
     }
 
     admin_registration_flash($result['success'] ? 'success' : 'error', $result['message']);
+// Redirect Handling
     header('Location: ' . $redirect_path);
     exit;
 }
+
+
+
+
+

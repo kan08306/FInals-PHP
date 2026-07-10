@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | Event Listings';
 $current_page = 'events';
 $base_path = '../';
@@ -55,6 +56,7 @@ $destinations = [
 $popular_cities = ['Manila', 'Quezon City', 'Pasig', 'Taguig'];
 
 require_once __DIR__ . '/../includes/countries.php';
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -206,3 +208,5 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

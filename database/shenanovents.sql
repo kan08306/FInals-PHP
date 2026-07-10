@@ -2,7 +2,9 @@
 -- Phase 6 Participant Module Schema
 -- Native PHP + MySQL + mysqli project
 
+-- Database Creation
 CREATE DATABASE IF NOT EXISTS shenanovents_db;
+-- Active Database Selection
 USE shenanovents_db;
 
 DROP TABLE IF EXISTS attendance;
@@ -11,6 +13,7 @@ DROP TABLE IF EXISTS registrations;
 DROP TABLE IF EXISTS events;
 DROP TABLE IF EXISTS users;
 
+-- User Accounts Table
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(100) NOT NULL,
@@ -27,6 +30,7 @@ CREATE TABLE users (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Event Records Table
 CREATE TABLE events (
     event_id INT AUTO_INCREMENT PRIMARY KEY,
     event_title VARCHAR(150) NOT NULL,
@@ -63,6 +67,7 @@ CREATE TABLE events (
         ON DELETE RESTRICT
 );
 
+-- Event Registration Table
 CREATE TABLE registrations (
     registration_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -110,6 +115,7 @@ CREATE TABLE liked_events (
         UNIQUE (user_id, event_id)
 );
 
+-- Attendance Tracking Table
 CREATE TABLE attendance (
     attendance_id INT AUTO_INCREMENT PRIMARY KEY,
     registration_id INT NOT NULL UNIQUE,
@@ -128,11 +134,13 @@ CREATE TABLE attendance (
         ON DELETE RESTRICT
 );
 
+-- Sample User Records
 INSERT INTO users (user_id, first_name, last_name, email, password, role, status, profile_picture, security_question, security_answer, created_at) VALUES
 (1, 'Admin', 'User', 'admin@shenanovents.test', '$2y$10$q1Pih.vnO6VXl1Xx512UIusFLax7.rMW4/PW0qVMzFh8SlVXmnR3u', 'admin', 'active', NULL, 'What city were you born in?', '$2y$10$gGwUCpx8xMIdyTVOks/KpeT6dLi1x1L9tbqRzuohGg80HHe1/05oC', '2026-07-03 20:50:53'),
 (2, 'Ken', 'Bautista', 'ken@shenanovents.test', '$2y$10$xNlLDM54aYnPBXRS0ZgcEuBloWWX6aEqFvtmwRuHZuBATD7JihAZ2', 'participant', 'active', NULL, 'What is your favorite food?', '$2y$10$IuMg1D3FqeHKOLT/4pR5hOTvlhO6nDxnryQQAIYpiJMH7/Gnn.Ewm', '2026-07-03 20:50:53'),
 (6, 'Hurris', 'Guansing', 'hurris@shenanovents.test', '$2y$10$hziawcDJWdFCbnGATnDm4O3eCQKZc86Hk1HjGPTVWYPm7sAPb3Wja', 'participant', 'active', NULL, 'What is your favorite food?', '$2y$10$IuMg1D3FqeHKOLT/4pR5hOTvlhO6nDxnryQQAIYpiJMH7/Gnn.Ewm', '2026-07-05 16:38:58');
 
+-- Sample Event Records
 INSERT INTO events (
     event_id, event_title, event_summary, event_description, event_tags, event_category, event_type,
     event_location, event_country, event_province, event_city, event_address, event_venue,
@@ -146,6 +154,7 @@ INSERT INTO events (
 (5, 'Private Leadership Briefing', 'Invite-only event for selected student leaders.', 'A private planning session for invited student leaders and organization representatives.', 'leadership, private, planning', 'education', 'physical', 'FEU Tech Collaboration Room, Manila, Philippines', 'Philippines', 'Metro Manila', 'Manila', 'P. Paredes Street', 'FEU Tech Collaboration Room', NULL, NULL, '2026-09-25', '14:00:00', '16:00:00', 40, NULL, 'private', 'Invite-only guests', 'PRIVATE-SHNV-N5P6Q7', NULL, NULL, 'open', 2, '2026-07-05 21:30:00'),
 (6, 'Scheduled Community Expo', 'A public event scheduled for later publishing.', 'A community expo that should stay hidden until its publish schedule is reached.', 'community, expo, scheduled', 'community', 'physical', 'Cebu City Convention Center, Cebu, Philippines', 'Philippines', 'Cebu', 'Cebu', 'Cebu Business Park', 'Cebu City Convention Center', NULL, NULL, '2026-10-05', '09:00:00', '17:00:00', 150, NULL, 'public', 'Everyone', NULL, '2026-09-20', '08:00:00', 'pending', 2, '2026-07-05 21:45:00');
 
+-- Sample Registration Records
 INSERT INTO registrations (registration_id, user_id, event_id, registration_full_name, registration_email, contact_number, attendee_count, special_notes, registration_status, attendance_code, attendance_status, attendance_marked_at, registered_at) VALUES
 (1, 2, 1, 'Ken Bautista', 'ken@shenanovents.test', '09170000001', 1, 'Interested in password safety topics.', 'registered', 'SHNV-2026-A1B2C3', 'pending', NULL, '2026-07-05 19:25:52'),
 (3, 2, 2, 'Ken Bautista', 'ken@shenanovents.test', '09170000001', 1, 'Schedule conflict after registration.', 'cancelled', 'SHNV-2026-D4E5F6', 'pending', NULL, '2026-07-05 19:20:47'),
@@ -169,3 +178,12 @@ INSERT INTO attendance (attendance_id, registration_id, attendance_status, marke
 -- SELECT MAX(capacity) AS largest_event_capacity FROM events;
 -- SELECT MIN(capacity) AS smallest_event_capacity FROM events;
 -- SELECT AVG(capacity) AS average_event_capacity FROM events;
+
+
+
+
+
+
+
+
+

@@ -1,9 +1,11 @@
 <?php
+// Authentication Page Setup
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../database/connection.php';
 
 if (is_user_logged_in()) {
     if (($_SESSION['user_role'] ?? '') === 'admin') {
+// Redirect Handling
         header('Location: ../admin/admin-dashboard.php');
         exit;
     }
@@ -22,6 +24,7 @@ $success_message = $_SESSION['auth_success'] ?? '';
 $notice_message = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_success'], $_SESSION['auth_error']);
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -177,3 +180,7 @@ $safe_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
     <script src="../assets/js/main.js?v=<?php echo $safe_asset_version; ?>"></script>
 </body>
 </html>
+
+
+
+

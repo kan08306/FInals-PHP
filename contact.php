@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | Contact';
 $current_page = 'home';
 $info_kicker = 'Company';
@@ -17,3 +18,5 @@ $info_sections = [
 $info_cta = ['title' => 'Need support instead?', 'body' => 'For account, registration, and event issues, use the support page.', 'label' => 'Contact Support', 'href' => 'contact-support.php'];
 
 require_once 'includes/info-page-template.php';
+
+

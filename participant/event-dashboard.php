@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | Event Dashboard';
 $current_page = 'dashboard';
 $base_path = '../';
@@ -11,6 +12,7 @@ require_once __DIR__ . '/../includes/participant-data.php';
 $participant_id = participant_current_user_id();
 $selected_event_id = (int) ($_GET['event'] ?? 0);
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['dashboard_action'] ?? '') === 'close_event') {
     $posted_event_id = (int) ($_POST['event_id'] ?? 0);
     $dashboard_event = $posted_event_id > 0 ? participant_fetch_owned_event_dashboard($conn, $participant_id, $posted_event_id) : null;
@@ -25,6 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['dashboard_action'] ?? '') 
         participant_flash('error', 'Unable to close the selected event. Please try again.');
     }
 
+// Redirect Handling
     header('Location: event-dashboard.php?event=' . $posted_event_id);
     exit;
 }
@@ -46,6 +49,7 @@ $event_banner_src = $event ? participant_event_banner_src($event, '../') : '';
 $success_message = participant_get_flash('success');
 $error_message = participant_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -230,3 +234,7 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+

@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Event Approvals';
 $current_page = 'admin';
 $base_path = '../';
@@ -14,6 +15,7 @@ $first_event = $submitted_events[0] ?? null;
 $success_message = admin_event_get_flash('success');
 $error_message = admin_event_get_flash('error');
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -185,3 +187,5 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

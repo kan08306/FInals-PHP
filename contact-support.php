@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | Contact Support';
 $current_page = 'home';
 $info_kicker = 'Resources';
@@ -17,3 +18,5 @@ $info_sections = [
 $info_cta = ['title' => 'Ready to continue?', 'body' => 'Return to event browsing after checking the support information.', 'label' => 'Browse Events', 'href' => 'participant/events.php'];
 
 require_once 'includes/info-page-template.php';
+
+

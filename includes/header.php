@@ -1,4 +1,5 @@
 <?php
+// Shared Include Setup
 require_once __DIR__ . '/session.php';
 
 $current_page = $current_page ?? 'home';
@@ -125,3 +126,5 @@ $safe_display_user_name = htmlspecialchars($display_user_name, ENT_QUOTES, 'UTF-
     </header>
 
     <main>
+
+

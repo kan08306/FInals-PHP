@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | About Us';
 $current_page = 'home';
 $info_kicker = 'Company';
@@ -17,3 +18,5 @@ $info_sections = [
 $info_cta = ['title' => 'Explore the platform', 'body' => 'View available events and see how the Shenanovents experience works.', 'label' => 'Browse Events', 'href' => 'participant/events.php'];
 
 require_once 'includes/info-page-template.php';
+
+

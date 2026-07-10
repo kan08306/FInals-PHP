@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | Private Event Access';
 $current_page = 'events';
 $base_path = '../';
@@ -6,6 +7,7 @@ $base_path = '../';
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
+// P Ri Va Te E Ve Nt S Af E R Et Ur N U Rl
 function private_event_safe_return_url($fallback = 'events.php')
 {
     $return_to = trim((string) ($_POST['return_to'] ?? ''));
@@ -17,7 +19,9 @@ function private_event_safe_return_url($fallback = 'events.php')
     return $return_to;
 }
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+// Redirect Handling
     header('Location: events.php');
     exit;
 }
@@ -34,3 +38,7 @@ $return_to = private_event_safe_return_url();
 $separator = strpos($return_to, '?') === false ? '?' : '&';
 header('Location: ' . $return_to . $separator . 'private_event=1');
 exit;
+
+
+
+

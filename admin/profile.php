@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Admin Profile';
 $current_page = 'admin';
 $base_path = '../';
@@ -13,6 +14,7 @@ $user = participant_fetch_profile($conn, $admin_id, 'admin');
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Admin account was not found.';
+// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -36,6 +38,7 @@ $statistics = [
     ['icon' => 'icon-ticket', 'label' => 'Registrations', 'total' => $summary['total_registrations']],
 ];
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -114,3 +117,6 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+

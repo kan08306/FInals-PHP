@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | Discover Events';
 $current_page = 'home';
 
@@ -32,6 +33,7 @@ $destinations = [
 
 $popular_cities = ['Manila', 'Quezon City', 'Pasig', 'Taguig'];
 
+// Shared Layout Rendering
 require_once 'includes/header.php';
 ?>
 
@@ -154,3 +156,5 @@ require_once 'includes/header.php';
 </section>
 
 <?php require_once 'includes/footer.php'; ?>
+
+

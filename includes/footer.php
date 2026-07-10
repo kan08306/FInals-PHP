@@ -151,3 +151,4 @@
     <script src="<?php echo htmlspecialchars($base_path ?? '', ENT_QUOTES, 'UTF-8'); ?>assets/js/main.js?v=<?php echo htmlspecialchars($asset_version ?? 'frontend-standards', ENT_QUOTES, 'UTF-8'); ?>"></script>
 </body>
 </html>
+

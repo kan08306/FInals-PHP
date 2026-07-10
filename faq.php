@@ -1,4 +1,5 @@
 <?php
+// Public Page Setup
 $page_title = 'Shenanovents | FAQ';
 $current_page = 'home';
 $info_kicker = 'Resources';
@@ -18,3 +19,5 @@ $info_sections = [
 $info_cta = ['title' => 'Still have questions?', 'body' => 'Contact support and include the page or feature you need help with.', 'label' => 'Contact Support', 'href' => 'contact-support.php'];
 
 require_once 'includes/info-page-template.php';
+
+

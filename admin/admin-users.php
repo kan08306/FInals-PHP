@@ -1,4 +1,5 @@
 <?php
+// Administrator Page Setup
 $page_title = 'Shenanovents | Manage Users';
 $current_page = 'admin';
 $base_path = '../';
@@ -16,6 +17,7 @@ $success_message = admin_user_get_flash('success');
 $error_message = admin_user_get_flash('error');
 $current_admin_id = (int) ($_SESSION['user_id'] ?? 0);
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -312,3 +314,5 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+

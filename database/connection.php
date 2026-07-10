@@ -1,4 +1,5 @@
 <?php
+// Database Connection Setup
 $database_host = 'localhost';
 $database_username = 'root';
 $database_password = '';
@@ -11,3 +12,5 @@ if (!$conn) {
 }
 
 mysqli_set_charset($conn, 'utf8mb4');
+
+

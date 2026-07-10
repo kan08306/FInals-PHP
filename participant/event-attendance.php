@@ -1,4 +1,5 @@
 <?php
+// Participant Page Setup
 $page_title = 'Shenanovents | Event Attendance';
 $current_page = 'dashboard';
 $base_path = '../';
@@ -11,6 +12,7 @@ require_once __DIR__ . '/../includes/participant-data.php';
 $participant_id = participant_current_user_id();
 $selected_event_id = (int) ($_GET['event'] ?? ($_POST['event_id'] ?? 0));
 
+// Form Submission Handling
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event = $selected_event_id > 0 ? participant_fetch_owned_event_dashboard($conn, $participant_id, $selected_event_id) : null;
     $action = $_POST['attendance_action'] ?? '';
@@ -27,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     participant_flash($result['success'] ? 'success' : 'error', $result['message']);
+// Redirect Handling
     header('Location: event-attendance.php?event=' . $selected_event_id);
     exit;
 }
@@ -43,6 +46,7 @@ $error_message = participant_get_flash('error');
 $status = $event ? strtolower($event['status']) : '';
 $status_class = $status === 'open' ? 'registered' : ($status === 'closed' ? 'cancelled' : $status);
 
+// Shared Layout Rendering
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
@@ -251,3 +255,7 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
+
+
