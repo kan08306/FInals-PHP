@@ -1,5 +1,5 @@
-<?php
-// About Page Setup
+﻿<?php
+// Public Page Setup
 $page_title = 'Shenanovents | About Us';
 $current_page = 'home';
 $info_kicker = 'Company';

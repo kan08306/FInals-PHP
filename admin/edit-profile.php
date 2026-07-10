@@ -1,10 +1,11 @@
 <?php
-// Administrator Page Setup
+// Edit Profile Page Setup
 $page_title = 'Shenanovents | Edit Admin Profile';
 $current_page = 'admin';
 $base_path = '../';
 $asset_version = 'admin-interface-standard';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
@@ -13,7 +14,6 @@ $user = participant_fetch_profile($conn, $admin_id, 'admin');
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Admin account was not found.';
-// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -26,7 +26,7 @@ $first_name = $user['first_name'];
 $last_name = $user['last_name'];
 $email = $user['email'];
 
-// Form Submission Handling
+// Form Processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form_action = $_POST['form_action'] ?? 'update_profile';
 
@@ -59,10 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="profile-page" aria-labelledby="editProfileTitle">
     <div class="profile-shell">
         <div class="profile-header-card">
@@ -92,6 +93,7 @@ require_once __DIR__ . '/../includes/header.php';
 
             <?php participant_render_feedback($success_message, '', $errors); ?>
 
+            <!-- Form -->
             <form class="participant-form-card" action="edit-profile.php" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="form_action" value="update_profile">
 
@@ -169,7 +171,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-
-
-

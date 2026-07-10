@@ -1,9 +1,11 @@
 <?php
-// Shared Include Setup
-// Shared Layout Rendering
+// Information Page Template
+// Shared Dependencies
+// Page Header
 require_once __DIR__ . '/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="info-page" aria-labelledby="infoPageTitle">
     <div class="info-page-inner">
         <div class="info-hero">
@@ -59,5 +61,3 @@ require_once __DIR__ . '/header.php';
 </section>
 
 <?php require_once __DIR__ . '/footer.php'; ?>
-
-

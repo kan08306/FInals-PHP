@@ -1,10 +1,7 @@
 <?php
-// Participant Page Setup
+// Registered Events Page Setup
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 
-// Redirect Handling
 header('Location: tickets.php');
 exit;
-
-
-

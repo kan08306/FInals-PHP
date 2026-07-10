@@ -1,5 +1,6 @@
 <?php
-// Shared Include Setup
+// Shared Header Setup
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 
 $current_page = $current_page ?? 'home';
@@ -32,6 +33,7 @@ $safe_display_user_name = htmlspecialchars($display_user_name, ENT_QUOTES, 'UTF-
     <link rel="stylesheet" href="<?php echo $safe_base_path; ?>assets/css/style.css?v=<?php echo $safe_asset_version; ?>">
 </head>
 <body<?php echo !empty($body_class) ? ' class="' . htmlspecialchars($body_class, ENT_QUOTES, 'UTF-8') . '"' : ''; ?>>
+    <!-- Header -->
     <header class="site-header">
         <div class="header-inner">
             <a class="brand" href="<?php echo $safe_logo_href; ?>" aria-label="<?php echo $safe_logo_label; ?>">
@@ -45,6 +47,7 @@ $safe_display_user_name = htmlspecialchars($display_user_name, ENT_QUOTES, 'UTF-
             </button>
 
             <?php if ($is_admin_page): ?>
+                <!-- Navigation -->
                 <nav class="main-nav app-nav admin-nav pill-menu<?php echo $admin_nav_has_active ? '' : ' no-active'; ?>" aria-label="Administrator navigation">
                     <a class="<?php echo $current_file === 'admin-dashboard.php' ? 'active' : ''; ?>" href="<?php echo $safe_base_path; ?>admin/admin-dashboard.php">
                         Dashboard
@@ -125,6 +128,5 @@ $safe_display_user_name = htmlspecialchars($display_user_name, ENT_QUOTES, 'UTF-
         </div>
     </header>
 
+    <!-- Main Content -->
     <main>
-
-

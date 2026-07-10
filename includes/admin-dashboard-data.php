@@ -1,10 +1,11 @@
 <?php
-// Shared Include Setup
+// Admin Dashboard Data Helpers
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 require_once __DIR__ . '/admin-event-data.php';
 
-// A Dm In D As Hb Oa Rd C Ou Nt
+// Dashboard Count
 function admin_dashboard_count($conn, $sql)
 {
     $result = mysqli_query($conn, $sql);
@@ -18,7 +19,7 @@ function admin_dashboard_count($conn, $sql)
     return (int) ($row['total'] ?? 0);
 }
 
-// A Dm In D As Hb Oa Rd A Va Il Ab Le E Ve Nt S Ql
+// Dashboard Available Event SQL
 function admin_dashboard_available_event_sql()
 {
     return 'LOWER(status) IN ("open", "published", "approved", "active")
@@ -32,7 +33,7 @@ function admin_dashboard_available_event_sql()
             )';
 }
 
-// A Dm In D As Hb Oa Rd P Ub Li C E Ve Nt S Ql
+// Dashboard Public Event SQL
 function admin_dashboard_public_event_sql()
 {
     return admin_dashboard_available_event_sql() . '
@@ -40,7 +41,7 @@ function admin_dashboard_public_event_sql()
             AND event_date >= CURDATE()';
 }
 
-// A Dm In D As Hb Oa Rd F Et Ch S Um Ma Ry
+// Dashboard Fetch Summary
 function admin_dashboard_fetch_summary($conn)
 {
     $public_event_sql = admin_dashboard_public_event_sql();
@@ -62,7 +63,7 @@ function admin_dashboard_fetch_summary($conn)
     ];
 }
 
-// A Dm In D As Hb Oa Rd F Et Ch R Eg Is Tr At Io N A Ct Iv It Y
+// Dashboard Fetch Registration Activity
 function admin_dashboard_fetch_registration_activity($conn)
 {
     $activity = [];
@@ -72,7 +73,6 @@ function admin_dashboard_fetch_registration_activity($conn)
             WHERE LOWER(registration_status) = "registered"
             AND registered_at >= ?
             AND registered_at < ?';
-// Prepared Statement Setup
     $stmt = mysqli_prepare($conn, $sql);
 
     for ($index = 4; $index >= 0; $index--) {
@@ -104,7 +104,7 @@ function admin_dashboard_fetch_registration_activity($conn)
     return $activity;
 }
 
-// A Dm In D As Hb Oa Rd P Re Pa Re R Eg Is Tr At Io N C Ha Rt
+// Dashboard Prepare Registration Chart
 function admin_dashboard_prepare_registration_chart($activity)
 {
     $max_value = 0;
@@ -140,7 +140,7 @@ function admin_dashboard_prepare_registration_chart($activity)
     ];
 }
 
-// A Dm In D As Hb Oa Rd P Re Pa Re R Eg Is Tr At Io N B Ar S
+// Dashboard Prepare Registration Bars
 function admin_dashboard_prepare_registration_bars($activity)
 {
     $max_value = 0;
@@ -164,7 +164,7 @@ function admin_dashboard_prepare_registration_bars($activity)
     return $bars;
 }
 
-// A Dm In D As Hb Oa Rd F Et Ch E Ve Nt S Ta Tu S S Um Ma Ry
+// Dashboard Fetch Event Status Summary
 function admin_dashboard_fetch_event_status_summary($conn, $summary)
 {
     $items = [
@@ -189,7 +189,7 @@ function admin_dashboard_fetch_event_status_summary($conn, $summary)
     return $items;
 }
 
-// A Dm In D As Hb Oa Rd F Et Ch A Pp Ro Va L S Um Ma Ry
+// Dashboard Fetch Approval Summary
 function admin_dashboard_fetch_approval_summary($conn)
 {
     return [
@@ -199,7 +199,7 @@ function admin_dashboard_fetch_approval_summary($conn)
     ];
 }
 
-// A Dm In D As Hb Oa Rd R El At Iv E T Im E
+// Dashboard Relative Time
 function admin_dashboard_relative_time($date_time)
 {
     $timestamp = strtotime((string) $date_time);
@@ -237,7 +237,7 @@ function admin_dashboard_relative_time($date_time)
     return date('M j, Y', $timestamp);
 }
 
-// A Dm In D As Hb Oa Rd F Et Ch R Ec En T A Ct Iv It Y
+// Dashboard Fetch Recent Activity
 function admin_dashboard_fetch_recent_activity($conn, $limit = 6)
 {
     $limit = max(1, min(10, (int) $limit));
@@ -289,6 +289,3 @@ function admin_dashboard_fetch_recent_activity($conn, $limit = 6)
 
     return $activities;
 }
-
-
-

@@ -1,4 +1,4 @@
-/* Design Tokens */
+/* CSS Variables */
 :root {
     --primary-green: #006B3F;
     --dark-green: #014421;
@@ -23,7 +23,6 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Base Page Layout */
 body {
     margin: 0;
     background: var(--light-bg);
@@ -62,7 +61,7 @@ main {
     width: 100%;
 }
 
-/* Site Header */
+/* Header Navigation */
 .site-header {
     position: sticky;
     top: 0;
@@ -121,7 +120,6 @@ main {
     --indicator-height: var(--pill-item-height);
 }
 
-/* Primary Navigation */
 .main-nav {
     justify-self: center;
 }
@@ -350,6 +348,7 @@ main {
     display: none;
 }
 
+/* Page Sections */
 .page-section {
     min-height: calc(100vh - 72px);
     padding: 74px 0;
@@ -534,7 +533,6 @@ main {
     box-shadow: 0 8px 18px rgba(1, 68, 33, 0.12);
 }
 
-/* Browse Control Panel */
 .browse-controls {
     display: flex;
     flex-wrap: wrap;
@@ -544,7 +542,6 @@ main {
     margin-bottom: 24px;
 }
 
-/* Location Filter Controls */
 .location-select {
     width: min(320px, 100%);
     position: relative;
@@ -943,7 +940,6 @@ main {
     white-space: nowrap;
 }
 
-/* Event Card Grid */
 .event-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -955,7 +951,7 @@ main {
     scroll-margin-top: 96px;
 }
 
-/* Event Card Component */
+/* Event Cards */
 .event-card {
     width: 100%;
     min-width: 0;
@@ -1205,6 +1201,7 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* Modal Windows */
 .registration-modal-overlay {
     position: fixed;
     inset: 0;
@@ -1619,7 +1616,6 @@ body.modal-open {
     color: rgba(1, 68, 33, 0.42);
 }
 
-/* Popular Destinations Section */
 .popular-section {
     min-height: auto;
     padding-top: 58px;
@@ -1648,7 +1644,6 @@ body.modal-open {
     font-weight: 700;
 }
 
-/* Destination Carousel */
 .destination-carousel {
     display: grid;
     grid-template-columns: 44px minmax(0, 1fr) 44px;
@@ -2599,6 +2594,7 @@ body.modal-open {
     display: none;
 }
 
+/* Responsive Breakpoints */
 @media (max-width: 980px) {
     .event-wizard-shell {
         grid-template-columns: 220px minmax(0, 1fr);
@@ -2664,6 +2660,7 @@ body.modal-open {
     }
 }
 
+/* Footer */
 .site-footer {
     background: var(--gold);
     color: var(--dark-green);
@@ -3216,7 +3213,6 @@ body.signup-page {
     font-family: inherit;
 }
 
-/* Signup Page Layout */
 .signup-layout {
     min-height: 100vh;
     display: flex;
@@ -3767,7 +3763,6 @@ body.signup-page {
 
 }
 
-/* Authentication Page Theme */
 body.auth-page {
     --auth-green: #0B6B45;
     --auth-green-hover: #0e7d52;
@@ -3787,6 +3782,7 @@ body.auth-page {
     font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
+/* Authentication Pages */
 .auth-main {
     width: 100%;
 }
@@ -4355,7 +4351,6 @@ body.auth-page {
     }
 }
 
-/* Event Maker Page Theme */
 body.create-event-body {
     min-height: 100vh;
     margin: 0;
@@ -5813,7 +5808,6 @@ body.create-event-body .publish-panel .wizard-actions {
 }
 
 /* User profile page */
-/* Profile Page Layout */
 .profile-page {
     min-height: calc(100vh - 72px);
     background: var(--light-bg);
@@ -6338,6 +6332,7 @@ body.create-event-body .publish-panel .wizard-actions {
     color: var(--white);
 }
 
+/* Dashboard Components */
 .dashboard-status-registered {
     background: rgba(0, 107, 63, 0.12);
 }
@@ -6686,7 +6681,6 @@ body.create-event-body .publish-panel .wizard-actions {
     height: 14px;
 }
 
-/* Event Dashboard Shell */
 .event-dashboard-shell {
     min-height: calc(100vh - 72px);
     display: grid;
@@ -7411,7 +7405,7 @@ body.create-event-body .publish-select input[data-public-audience-display] {
 }
 
 /* Administrator pages */
-/* Administrator Workspace Layout */
+/* Admin Pages */
 .admin-page {
     min-height: calc(100vh - 72px);
     background: var(--light-bg);
@@ -7427,7 +7421,6 @@ body.create-event-body .publish-select input[data-public-audience-display] {
     min-width: 112px;
 }
 
-/* Administrator Summary Cards */
 .admin-summary-grid {
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -7523,7 +7516,6 @@ body.create-event-body .publish-select input[data-public-audience-display] {
     font-weight: 800;
 }
 
-/* Administrator Toolbar */
 .admin-toolbar {
     display: flex;
     flex-wrap: wrap;
@@ -7922,7 +7914,6 @@ body.create-event-body .publish-select input[data-public-audience-display] {
     }
 }
 
-/* Administrator Detail Modal */
 .admin-detail-modal {
     width: min(760px, 100%);
 }
@@ -8226,7 +8217,6 @@ body.create-event-body .publish-select input[data-public-audience-display] {
     }
 }
 
-/* Approval Review Layout */
 .admin-approval-layout {
     display: grid;
     grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(240px, 300px);
@@ -8432,25 +8422,3 @@ body.create-event-body .publish-select input[data-public-audience-display] {
         min-height: 240px;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

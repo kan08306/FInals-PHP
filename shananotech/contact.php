@@ -1,5 +1,5 @@
-<?php
-// Contact Page Setup
+﻿<?php
+// Public Page Setup
 $page_title = 'Shenanovents | Contact';
 $current_page = 'home';
 $info_kicker = 'Company';

@@ -1,24 +1,27 @@
 <?php
-// Participant Page Setup
+// Participant Dashboard Page Setup
 $page_title = 'Shenanovents | My Events';
 $current_page = 'dashboard';
 $base_path = '../';
 $asset_version = 'my-events-restore';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
 $participant_id = participant_current_user_id();
 $all_events = participant_fetch_hosted_events($conn, $participant_id);
 $pagination = participant_paginate_items($all_events, participant_current_page(), 5);
+// Page Data Retrieval
 $events = $pagination['items'];
 $success_message = participant_get_flash('success');
 $error_message = participant_get_flash('error');
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="dashboard-page" aria-labelledby="dashboardTitle">
     <div class="dashboard-section">
         <div class="dashboard-title-row">
@@ -44,6 +47,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="dashboard-table-card">
+            <!-- Data Table -->
             <table class="dashboard-event-table">
                 <thead>
                     <tr>
@@ -114,5 +118,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

@@ -1,5 +1,5 @@
-<?php
-// Logout Processing
+﻿<?php
+// Authentication Page Setup
 // Shared Dependencies
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../database/connection.php';
@@ -17,5 +17,6 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
+// Redirect Handling
 header('Location: ../index.php');
 exit;

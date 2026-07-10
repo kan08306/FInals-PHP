@@ -1,5 +1,5 @@
-<?php
-// Contact Support Page Setup
+﻿<?php
+// Public Page Setup
 $page_title = 'Shenanovents | Contact Support';
 $current_page = 'home';
 $info_kicker = 'Resources';

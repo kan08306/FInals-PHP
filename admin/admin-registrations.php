@@ -1,9 +1,10 @@
 <?php
-// Administrator Page Setup
+// Admin Registration Management Page Setup
 $page_title = 'Shenanovents | Manage Registrations';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-registration-data.php';
 
@@ -26,18 +27,21 @@ if ($status_filter !== '') {
 }
 
 $redirect_path = 'admin-registrations.php' . (!empty($redirect_params) ? '?' . http_build_query($redirect_params) : '');
+// Registration Management Form Processing
 admin_registration_handle_post($conn, $redirect_path);
 
 $event_options = admin_registration_fetch_event_options($conn);
 $summary = admin_registration_fetch_summary($conn);
+// Page Data Retrieval
 $registrations = admin_registration_fetch_registrations($conn, $event_filter, $status_filter);
 $success_message = admin_registration_get_flash('success');
 $error_message = admin_registration_get_flash('error');
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="manageRegistrationsTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -79,6 +83,7 @@ require_once __DIR__ . '/../includes/header.php';
             </article>
         </div>
 
+        <!-- Form -->
         <form class="admin-toolbar admin-filter-form" method="get" action="admin-registrations.php">
             <label class="admin-filter-field">
                 <span>Event</span>
@@ -111,6 +116,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
 
         <div class="dashboard-table-card">
+            <!-- Data Table -->
             <table class="dashboard-event-table admin-table">
                 <thead>
                     <tr>
@@ -197,5 +203,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

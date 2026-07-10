@@ -1,24 +1,28 @@
 <?php
-// Administrator Page Setup
+// Admin Event Management Page Setup
 $page_title = 'Shenanovents | Manage Events';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-event-data.php';
 
+// Event Management Form Processing
 admin_event_handle_post($conn, 'admin-events.php');
 
+// Page Data Retrieval
 $events = admin_event_fetch_events($conn);
 $admin_page_size = 5;
 $admin_total_pages = max(1, (int) ceil(count($events) / $admin_page_size));
 $success_message = admin_event_get_flash('success');
 $error_message = admin_event_get_flash('error');
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="manageEventsTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -66,6 +70,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="dashboard-table-card">
+            <!-- Data Table -->
             <table class="dashboard-event-table admin-table">
                 <thead>
                     <tr>
@@ -194,6 +199,7 @@ require_once __DIR__ . '/../includes/header.php';
     </div>
 </section>
 
+<!-- Admin Details Modal -->
 <div class="registration-modal-overlay" data-admin-detail-modal aria-hidden="true" hidden>
     <section class="registration-modal-card admin-detail-modal admin-view-modal" role="dialog" aria-modal="true" aria-labelledby="eventDetailTitle">
         <button class="registration-modal-close" type="button" aria-label="Close event details" data-modal-close>&times;</button>
@@ -304,6 +310,7 @@ require_once __DIR__ . '/../includes/header.php';
 
         <div class="admin-detail-actions admin-detail-actions-compact" data-admin-detail-actions>
             <div class="admin-detail-action-row admin-detail-action-row-status" data-admin-detail-action-group="status">
+                <!-- Form -->
                 <form action="admin-events.php" method="post" data-admin-detail-action="approve-publish">
                     <input type="hidden" name="event_id" data-admin-detail-event-id>
                     <button class="button button-primary admin-small-button" type="submit" name="admin_event_action" value="approve_publish_event">Approve</button>
@@ -483,5 +490,3 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

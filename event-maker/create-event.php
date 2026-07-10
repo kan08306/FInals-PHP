@@ -5,6 +5,7 @@ $current_page = 'events';
 $body_class = 'create-event-body';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 require_once __DIR__ . '/../includes/countries.php';
@@ -14,7 +15,6 @@ $user = participant_fetch_profile($conn, $participant_id);
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Participant account was not found.';
-// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -51,7 +51,7 @@ $location_required_attr = (!$is_review_mode || $location_can_update) ? ' require
 $details_locked_attr = $is_review_mode ? ' disabled' : '';
 $publish_locked_attr = $is_review_mode ? ' disabled' : '';
 
-// Form Submission Handling
+// Form Processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $form_action = $_POST['form_action'] ?? 'create_event';
     $result = ['success' => false, 'errors' => ['Invalid form action.'], 'event_id' => 0];
@@ -77,11 +77,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event_errors = $result['errors'];
 }
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="create-event-page" aria-label="Create event workflow">
+    <!-- Form -->
     <form class="event-wizard-shell" action="create-event.php<?php echo $is_review_mode ? '?event=' . (int) $editing_event_id . '&step=' . (int) $initial_step : ''; ?>" method="post" enctype="multipart/form-data" data-event-wizard data-initial-step="<?php echo (int) $initial_step; ?>"<?php echo $is_review_mode ? ' data-existing-event="1"' : ''; ?><?php echo ($is_review_mode && !$location_can_update) ? ' data-location-locked="1"' : ''; ?> novalidate>
         <input type="hidden" name="form_action" value="<?php echo $is_review_mode ? 'update_event_location' : 'create_event'; ?>">
         <?php if ($is_review_mode): ?>
@@ -130,6 +132,7 @@ require_once __DIR__ . '/../includes/header.php';
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="wizard-panel" aria-live="polite">
             <?php participant_render_feedback('', '', $event_errors); ?>
 
@@ -406,7 +409,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-
-
-

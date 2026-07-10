@@ -1,9 +1,10 @@
 <?php
-// Administrator Page Setup
+// Admin Attendance Management Page Setup
 $page_title = 'Shenanovents | Attendance';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-attendance-data.php';
 
@@ -26,6 +27,7 @@ if ($attendance_filter !== 'all') {
 }
 
 $redirect_path = 'admin-attendance.php' . (!empty($redirect_params) ? '?' . http_build_query($redirect_params) : '');
+// Attendance Management Form Processing
 admin_attendance_handle_post($conn, $redirect_path);
 
 $event_options = admin_registration_fetch_event_options($conn);
@@ -35,14 +37,16 @@ $pending_total = (int) $summary['pending'];
 $present_total = (int) $summary['present'];
 $absent_total = (int) $summary['absent'];
 $participants = admin_attendance_fetch_participants($conn, $event_filter, $attendance_filter);
+// Page Data Retrieval
 $attendance_records = admin_attendance_fetch_records($conn, $event_filter, $attendance_filter);
 $success_message = admin_attendance_get_flash('success');
 $error_message = admin_attendance_get_flash('error');
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="attendanceTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -89,6 +93,7 @@ require_once __DIR__ . '/../includes/header.php';
             </article>
         </div>
 
+        <!-- Form -->
         <form class="admin-toolbar admin-filter-form" method="get" action="admin-attendance.php">
             <label class="admin-filter-field">
                 <span>Event</span>
@@ -120,6 +125,7 @@ require_once __DIR__ . '/../includes/header.php';
         </form>
 
         <div class="dashboard-table-card">
+            <!-- Data Table -->
             <table class="dashboard-event-table admin-table">
                 <thead>
                     <tr>
@@ -249,5 +255,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

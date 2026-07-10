@@ -1,13 +1,15 @@
 <?php
-// Participant Page Setup
+// Participant Tickets Page Setup
 $page_title = 'Shenanovents | Tickets Registered';
 $current_page = 'events';
 $base_path = '../';
 $asset_version = 'participant-module-update';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
+// Registration Management
 participant_handle_registration_post($conn);
 
 $participant_id = participant_current_user_id();
@@ -24,6 +26,7 @@ $all_events = participant_filter_event_items($all_events, [
     'country' => $country_filter,
 ]);
 $pagination = participant_paginate_items($all_events, participant_current_page(), 8);
+// Page Data Retrieval
 $events = $pagination['items'];
 $success_message = participant_get_flash('success');
 $error_message = participant_get_flash('error');
@@ -52,10 +55,11 @@ $destinations = [
 $popular_cities = ['Manila', 'Quezon City', 'Pasig', 'Taguig'];
 
 require_once __DIR__ . '/../includes/countries.php';
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="page-section listings-section" aria-labelledby="listingsTitle">
     <div class="explore-events-header">
         <h1 id="listingsTitle">Tickets Registered</h1>
@@ -160,5 +164,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

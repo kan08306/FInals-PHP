@@ -1,10 +1,11 @@
 <?php
-// Participant Page Setup
+// Profile Page Setup
 $page_title = 'Shenanovents | User Profile';
 $current_page = 'events';
 $base_path = '../';
 $asset_version = 'participant-module-update';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
@@ -13,7 +14,6 @@ $user = participant_fetch_profile($conn, $participant_id);
 
 if (!$user) {
     $_SESSION['auth_error'] = 'Participant account was not found.';
-// Redirect Handling
     header('Location: ../auth/signin.php');
     exit;
 }
@@ -47,7 +47,7 @@ $statistics = [
     ['icon' => 'icon-heart', 'label' => 'Cancelled Events', 'total' => $summary['cancelled']],
 ];
 
-// R En De R P Ro Fi Le E Ve Nt C Ar D
+// Render Profile Event Card
 function render_profile_event_card($event, $label, $action, $href)
 {
     $event['registration_label'] = $label;
@@ -88,7 +88,7 @@ function render_profile_event_card($event, $label, $action, $href)
     <?php
 }
 
-// R En De R P Ro Fi Le E Mp Ty S Ta Te
+// Render Profile Empty State
 function render_profile_empty_state($message)
 {
     ?>
@@ -100,10 +100,11 @@ function render_profile_empty_state($message)
     <?php
 }
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="profile-page" aria-labelledby="profileTitle">
     <div class="profile-shell">
         <div class="profile-header-card">
@@ -251,7 +252,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-
-
-

@@ -1,5 +1,5 @@
 <?php
-// Shared Include Setup
+// Session Management
 if (!defined('REMEMBER_COOKIE_NAME')) {
     define('REMEMBER_COOKIE_NAME', 'shenanovents_remember');
 }
@@ -24,7 +24,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 if (!function_exists('is_user_logged_in')) {
-// I S U Se R L Og Ge D I N
+    // Is User Logged In
     function is_user_logged_in()
     {
         return !empty($_SESSION['is_logged_in']) && !empty($_SESSION['user_id']);
@@ -32,7 +32,7 @@ if (!function_exists('is_user_logged_in')) {
 }
 
 if (!function_exists('set_login_session')) {
-// S Et L Og In S Es Si On
+    // Set Login Session
     function set_login_session($user)
     {
         $_SESSION['user_id'] = (int) $user['user_id'];
@@ -44,7 +44,7 @@ if (!function_exists('set_login_session')) {
 }
 
 if (!function_exists('clear_login_session')) {
-// C Le Ar L Og In S Es Si On
+    // Clear Login Session
     function clear_login_session()
     {
         unset($_SESSION['user_id']);
@@ -56,7 +56,7 @@ if (!function_exists('clear_login_session')) {
 }
 
 if (!function_exists('get_remember_cookie_options')) {
-// G Et R Em Em Be R C Oo Ki E O Pt Io Ns
+    // Get Remember Cookie Options
     function get_remember_cookie_options($expires)
     {
         $is_secure = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
@@ -72,7 +72,7 @@ if (!function_exists('get_remember_cookie_options')) {
 }
 
 if (!function_exists('delete_remember_cookie')) {
-// D El Et E R Em Em Be R C Oo Ki E
+    // Delete Remember Cookie
     function delete_remember_cookie()
     {
         setcookie(REMEMBER_COOKIE_NAME, '', get_remember_cookie_options(time() - 3600));
@@ -81,7 +81,7 @@ if (!function_exists('delete_remember_cookie')) {
 }
 
 if (!function_exists('create_remember_login')) {
-// C Re At E R Em Em Be R L Og In
+    // Create Remember Login
     function create_remember_login($conn, $user_id)
     {
         $token = bin2hex(random_bytes(32));
@@ -90,7 +90,6 @@ if (!function_exists('create_remember_login')) {
         $expires_at = date('Y-m-d H:i:s', $expires_time);
 
         $sql = 'UPDATE users SET remember_token_hash = ?, remember_token_expires_at = ? WHERE user_id = ?';
-// Prepared Statement Setup
         $stmt = mysqli_prepare($conn, $sql);
 
         if (!$stmt) {
@@ -111,7 +110,7 @@ if (!function_exists('create_remember_login')) {
 }
 
 if (!function_exists('clear_remember_login')) {
-// C Le Ar R Em Em Be R L Og In
+    // Clear Remember Login
     function clear_remember_login($conn = null)
     {
         $user_id = (int) ($_SESSION['user_id'] ?? 0);
@@ -137,7 +136,7 @@ if (!function_exists('clear_remember_login')) {
 }
 
 if (!function_exists('restore_login_from_remember_cookie')) {
-// R Es To Re L Og In F Ro M R Em Em Be R C Oo Ki E
+    // Restore Login From Remember Cookie
     function restore_login_from_remember_cookie($conn)
     {
         if (is_user_logged_in() || empty($_COOKIE[REMEMBER_COOKIE_NAME])) {
@@ -202,6 +201,3 @@ if (!is_user_logged_in() && !empty($_COOKIE[REMEMBER_COOKIE_NAME])) {
     require_once __DIR__ . '/../database/connection.php';
     restore_login_from_remember_cookie($conn);
 }
-
-
-

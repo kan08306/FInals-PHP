@@ -1,11 +1,12 @@
 <?php
-// Shared Include Setup
+// Admin Report Generation Helpers
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 require_once __DIR__ . '/admin-dashboard-data.php';
 require_once __DIR__ . '/admin-registration-data.php';
 
-// A Dm In R Ep Or T A Tt En Da Nc E S Ta Tu S O Pt Io Ns
+// Report Attendance Status Options
 function admin_report_attendance_status_options()
 {
     return [
@@ -16,7 +17,7 @@ function admin_report_attendance_status_options()
     ];
 }
 
-// A Dm In R Ep Or T P Er Ce Nt
+// Report Percent
 function admin_report_percent($value, $total)
 {
     $value = (int) $value;
@@ -29,7 +30,7 @@ function admin_report_percent($value, $total)
     return (string) round(($value / $total) * 100) . '%';
 }
 
-// A Dm In R Ep Or T F Or Ma T D At Et Im E
+// Report Format Datetime
 function admin_report_format_datetime($date_time)
 {
     $timestamp = strtotime((string) $date_time);
@@ -37,7 +38,7 @@ function admin_report_format_datetime($date_time)
     return $timestamp ? date('m/d/Y g:i A', $timestamp) : 'N/A';
 }
 
-// A Dm In R Ep Or T F Et Ch P La Tf Or M S Um Ma Ry
+// Report Fetch Platform Summary
 function admin_report_fetch_platform_summary($conn)
 {
     return [
@@ -51,7 +52,7 @@ function admin_report_fetch_platform_summary($conn)
     ];
 }
 
-// A Dm In R Ep Or T E Ve Nt F Il Te R C On Di Ti On
+// Report Event Filter Condition
 function admin_report_event_filter_condition($conn, $event_id = 0, $event_date = '')
 {
     $event_id = (int) $event_id;
@@ -69,7 +70,7 @@ function admin_report_event_filter_condition($conn, $event_id = 0, $event_date =
     return $where;
 }
 
-// A Dm In R Ep Or T F Et Ch E Ve Nt P Ar Ti Ci Pa Ti On
+// Report Fetch Event Participation
 function admin_report_fetch_event_participation($conn, $event_id = 0, $event_date = '')
 {
     $where = admin_report_event_filter_condition($conn, $event_id, $event_date);
@@ -114,7 +115,7 @@ function admin_report_fetch_event_participation($conn, $event_id = 0, $event_dat
     return $rows;
 }
 
-// A Dm In R Ep Or T F Et Ch A Tt En Da Nc E S Um Ma Ry
+// Report Fetch Attendance Summary
 function admin_report_fetch_attendance_summary($conn, $event_id = 0, $event_date = '')
 {
     $where = admin_report_event_filter_condition($conn, $event_id, $event_date);
@@ -151,7 +152,7 @@ function admin_report_fetch_attendance_summary($conn, $event_id = 0, $event_date
     return $rows;
 }
 
-// A Dm In R Ep Or T F Et Ch A Tt En Da Nc E R Ec Or Ds
+// Report Fetch Attendance Records
 function admin_report_fetch_attendance_records($conn, $event_id = 0, $marked_date = '', $attendance_status = 'all')
 {
     $event_id = (int) $event_id;
@@ -202,5 +203,3 @@ function admin_report_fetch_attendance_records($conn, $event_id = 0, $marked_dat
 
     return $rows;
 }
-
-

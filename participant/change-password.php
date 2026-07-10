@@ -1,10 +1,7 @@
 <?php
-// Participant Page Setup
+// Password Change Page Setup
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 
-// Redirect Handling
 header('Location: edit-profile.php#editPasswordTitle');
 exit;
-
-
-

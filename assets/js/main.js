@@ -1,3 +1,4 @@
+// DOM Element References
 const menuButton = document.querySelector('.menu-toggle');
 const navigation = document.querySelector('.main-nav');
 const pillMenus = document.querySelectorAll('.pill-menu');
@@ -85,7 +86,6 @@ const authRequiredMessage = document.querySelector('[data-auth-required-message]
 const registrationModal = document.querySelector('[data-registration-modal]');
 const privateEventOpenButtons = document.querySelectorAll('[data-private-event-open]');
 const privateEventModal = document.querySelector('[data-private-event-modal]');
-// Modal Element References
 const modalCloseButtons = document.querySelectorAll('[data-modal-close]');
 const registrationForm = document.querySelector('[data-registration-form]');
 const registrationSuccess = document.querySelector('[data-registration-success]');
@@ -98,6 +98,7 @@ const registrationLocation = document.querySelector('[data-registration-location
 const registrationEventId = document.querySelector('input[data-registration-event-id]');
 const allowedBannerTypes = ['image/jpeg', 'image/png', 'image/webp'];
 const allowedBannerFilePattern = /\.(jpe?g|png|webp)$/i;
+// Shared Interface State
 let activeEventFilter = 'all';
 let activeCategoryFilter = 'all';
 let activeLocationFilter = document.querySelector('[data-location-filter].active')?.getAttribute('data-location-filter') || 'all';
@@ -109,6 +110,7 @@ let activeModal = null;
 let activeAdminEventRow = null;
 let activeAdminUserRow = null;
 const adminPageSize = 5;
+// Event Wizard State
 const eventWizardState = {
     currentStep: Number(eventWizard?.getAttribute('data-initial-step') || 1),
     completedSteps: new Set(),
@@ -119,6 +121,7 @@ const eventWizardState = {
 let activeCountryFilter = '';
 let countryCityOptions = {};
 
+// Country And City Options
 if (countryCityOptionsSource) {
     try {
         countryCityOptions = JSON.parse(countryCityOptionsSource.textContent || '{}');
@@ -127,6 +130,7 @@ if (countryCityOptionsSource) {
     }
 }
 
+// Togglepassword
 function togglePassword() {
     const field = document.getElementById('password-field') || document.getElementById('passwordInput');
     const icon = document.getElementById('eye-icon') || document.getElementById('passwordEyeIcon');
@@ -144,6 +148,7 @@ function togglePassword() {
         : '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
 }
 
+// Moveindicator
 function moveIndicator(menu, item) {
     if (!menu || !item) {
         return;
@@ -164,6 +169,7 @@ function moveIndicator(menu, item) {
     menu.style.setProperty('--indicator-height', `${Math.round(itemBox.height)}px`);
 }
 
+// Updatelocation
 function updateLocation(label) {
     if (locationLabel) {
         locationLabel.textContent = label;
@@ -174,6 +180,7 @@ function updateLocation(label) {
     }
 }
 
+// Eventmatchesactivefilters
 function eventMatchesActiveFilters(card) {
     const cardFilter = card.getAttribute('data-event-filter');
     const cardCategory = card.getAttribute('data-event-category');
@@ -189,6 +196,7 @@ function eventMatchesActiveFilters(card) {
     return matchesFilter && matchesCategory && matchesLocation && matchesCountry && matchesTicketStatus;
 }
 
+// Filterevents
 function filterEvents() {
     eventGrids.forEach((grid) => {
         const cards = Array.from(grid.querySelectorAll('[data-event-filter]'));
@@ -205,6 +213,7 @@ function filterEvents() {
     });
 }
 
+// Closelocationselect
 function closeLocationSelect() {
     if (!locationSelect || !locationSelectToggle) {
         return;
@@ -214,6 +223,7 @@ function closeLocationSelect() {
     locationSelectToggle.setAttribute('aria-expanded', 'false');
 }
 
+// Getcarouselstep
 function getCarouselStep() {
     if (!destinationTrack) {
         return 0;
@@ -231,6 +241,7 @@ function getCarouselStep() {
     return firstCard.offsetWidth + gap;
 }
 
+// Updatecarouselbuttons
 function updateCarouselButtons() {
     if (!destinationTrack || !carouselPreviousButton || !carouselNextButton) {
         return;
@@ -242,6 +253,7 @@ function updateCarouselButtons() {
     carouselNextButton.disabled = destinationTrack.scrollLeft >= maxScrollLeft - 2;
 }
 
+// Scrolldestinations
 function scrollDestinations(direction) {
     if (!destinationTrack) {
         return;
@@ -253,14 +265,17 @@ function scrollDestinations(direction) {
     });
 }
 
+// Getwizardfield
 function getWizardField(selector) {
     return eventWizard?.querySelector(selector);
 }
 
+// Getwizardvalue
 function getWizardValue(selector) {
     return getWizardField(selector)?.value.trim() || '';
 }
 
+// Getcitiesforcountry
 function getCitiesForCountry(country) {
     const countryName = country || 'Philippines';
 
@@ -277,6 +292,7 @@ function getCitiesForCountry(country) {
     ];
 }
 
+// Updatecityoptionsforcountry
 function updateCityOptionsForCountry(keepSelectedCity = false) {
     if (!eventCountrySelect || !eventCitySelect) {
         return;
@@ -304,6 +320,7 @@ function updateCityOptionsForCountry(keepSelectedCity = false) {
     eventCitySelect.dataset.selectedCity = selectedCity;
 }
 
+// Setwizarderror
 function setWizardError(step, message) {
     const errorBox = document.querySelector(`[data-step-error="${step}"]`);
 
@@ -312,6 +329,7 @@ function setWizardError(step, message) {
     }
 }
 
+// Normalizeeventdateinput
 function normalizeEventDateInput(value) {
     const digits = value.replace(/\D/g, '').slice(0, 8);
     const month = digits.slice(0, 2);
@@ -329,6 +347,7 @@ function normalizeEventDateInput(value) {
     return month;
 }
 
+// Parseeventdateinput
 function parseEventDateInput(value) {
     const match = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
 
@@ -352,6 +371,7 @@ function parseEventDateInput(value) {
     return parsedDate;
 }
 
+// Formatreadableeventdate
 function formatReadableEventDate(value) {
     const parsedDate = parseEventDateInput(value);
 
@@ -365,6 +385,7 @@ function formatReadableEventDate(value) {
     return `${monthName} ${parsedDate.getDate()}, ${parsedDate.getFullYear()}, ${weekdayName}`;
 }
 
+// Formatwizardtime
 function formatWizardTime(value) {
     if (!value) {
         return '';
@@ -385,6 +406,7 @@ function formatWizardTime(value) {
     });
 }
 
+// Buildeventdatetext
 function buildEventDateText() {
     const eventDate = formatReadableEventDate(getWizardValue('[data-event-date]'));
 
@@ -395,6 +417,7 @@ function buildEventDateText() {
     return 'Event Date';
 }
 
+// Buildeventtimetext
 function buildEventTimeText() {
     const startTime = formatWizardTime(getWizardValue('[data-event-start-time]'));
     const endTime = formatWizardTime(getWizardValue('[data-event-end-time]'));
@@ -406,6 +429,7 @@ function buildEventTimeText() {
     return startTime || endTime || '';
 }
 
+// Buildeventlocationtext
 function buildEventLocationText() {
     const locationType = getWizardValue('[data-event-location]');
     const onlineLink = getWizardValue('[data-event-online-link]');
@@ -436,6 +460,7 @@ function buildEventLocationText() {
     return locationType || 'Address of the event';
 }
 
+// Updateonlineplatformother
 function updateOnlinePlatformOther() {
     const showOtherField = onlinePlatformSelect?.value === 'Other';
     const locationLocked = eventWizardState.locationLocked;
@@ -448,6 +473,7 @@ function updateOnlinePlatformOther() {
     }
 }
 
+// Updatelocationtypefields
 function updateLocationTypeFields() {
     const selectedType = getWizardValue('[data-event-location]') || 'Venue';
     const showVenue = selectedType === 'Venue';
@@ -488,6 +514,7 @@ function updateLocationTypeFields() {
     updatePublishSummary();
 }
 
+// Updatemappreview
 function updateMapPreview() {
     const mapTitle = document.querySelector('[data-map-preview-title]');
     const mapLocation = document.querySelector('[data-map-preview-location]');
@@ -512,6 +539,7 @@ function updateMapPreview() {
     }
 }
 
+// Updatepublishsummary
 function updatePublishSummary() {
     const summaryTitle = document.querySelector('[data-summary-title]');
     const summaryCategory = document.querySelector('[data-summary-category]');
@@ -519,7 +547,6 @@ function updatePublishSummary() {
     const summaryLocation = document.querySelector('[data-summary-location]');
     const summaryDescription = document.querySelector('[data-summary-description]');
     const eventTitle = getWizardValue('[data-event-name]');
-// Event Data Collection
     const eventSummary = getWizardValue('[data-event-summary]');
     const eventDate = buildEventDateText();
     const eventTime = buildEventTimeText();
@@ -569,6 +596,7 @@ function updatePublishSummary() {
     }
 }
 
+// Updatewizardstep
 function updateWizardStep(step) {
     if (!eventWizard) {
         return;
@@ -598,6 +626,7 @@ function updateWizardStep(step) {
     updatePublishSummary();
 }
 
+// Validatewizardstep
 function validateWizardStep(step) {
     const panel = document.querySelector(`[data-step-panel="${step}"]`);
 
@@ -682,6 +711,7 @@ function validateWizardStep(step) {
     return isValid;
 }
 
+// Updatepublishcontrols
 function updatePublishControls() {
     const visibilityToggle = document.querySelector('[data-visibility-option]');
     const privateSelected = visibilityToggle?.checked;
@@ -732,6 +762,7 @@ function updatePublishControls() {
     }
 }
 
+// Getmatchingdashboardrows
 function getMatchingDashboardRows() {
     return Array.from(dashboardEventRows).filter((row) => {
         const rowStatus = row.getAttribute('data-dashboard-status');
@@ -740,6 +771,7 @@ function getMatchingDashboardRows() {
     });
 }
 
+// Filterdashboardrows
 function filterDashboardRows() {
     if (!dashboardEventRows.length) {
         return;
@@ -752,10 +784,12 @@ function filterDashboardRows() {
     });
 }
 
+// Getadminrowtext
 function getAdminRowText(row) {
     return row.getAttribute('data-admin-search-text') || row.textContent.toLowerCase();
 }
 
+// Getmatchingadminrows
 function getMatchingAdminRows() {
     const searchValue = adminSearchInput?.value.trim().toLowerCase() || '';
 
@@ -780,6 +814,7 @@ function getMatchingAdminRows() {
     });
 }
 
+// Syncadminpagebuttons
 function syncAdminPageButtons(totalPages) {
     const paginationMenu = document.querySelector('[data-admin-pagination]');
 
@@ -810,6 +845,7 @@ function syncAdminPageButtons(totalPages) {
     adminPageButtons = document.querySelectorAll('[data-admin-page]');
 }
 
+// Updateadminpagination
 function updateAdminPagination(totalRows) {
     const paginationMenu = document.querySelector('[data-admin-pagination]');
 
@@ -852,6 +888,7 @@ function updateAdminPagination(totalRows) {
     moveIndicator(paginationMenu, paginationMenu?.querySelector('.active'));
 }
 
+// Sortadminrows
 function sortAdminRows() {
     if (!adminRows.length || !adminSortSelect) {
         return;
@@ -874,6 +911,7 @@ function sortAdminRows() {
     sortedRows.forEach((row) => tbody.appendChild(row));
 }
 
+// Filteradminrows
 function filterAdminRows() {
     if (!adminRows.length) {
         return;
@@ -892,6 +930,7 @@ function filterAdminRows() {
     updateAdminPagination(matchingRows.length);
 }
 
+// Settext
 function setText(selector, value) {
     const elements = document.querySelectorAll(selector);
 
@@ -900,6 +939,7 @@ function setText(selector, value) {
     });
 }
 
+// Setformvalue
 function setFormValue(selector, value) {
     const element = document.querySelector(selector);
 
@@ -908,12 +948,14 @@ function setFormValue(selector, value) {
     }
 }
 
+// Setformvalues
 function setFormValues(selector, value) {
     document.querySelectorAll(selector).forEach((element) => {
         element.value = value || '';
     });
 }
 
+// Populateuserdetail
 function populateUserDetail(row) {
     activeAdminUserRow = row;
 
@@ -954,6 +996,7 @@ function populateUserDetail(row) {
     updateUserDetailActions(row);
 }
 
+// Updateuserdetailactions
 function updateUserDetailActions(row) {
     const userId = row.getAttribute('data-admin-id');
     const status = row.getAttribute('data-admin-status') || '';
@@ -983,6 +1026,7 @@ function updateUserDetailActions(row) {
     }
 }
 
+// Ensureadminuserformid
 function ensureAdminUserFormId(form) {
     const userIdField = form?.querySelector('input[name="user_id"]');
 
@@ -997,6 +1041,7 @@ function ensureAdminUserFormId(form) {
     return userIdField.value !== '';
 }
 
+// Populateuseredit
 function populateUserEdit(row) {
     setFormValue('[data-admin-user-edit-field="user_id"]', row.getAttribute('data-admin-id'));
     setFormValue('[data-admin-user-edit-field="first_name"]', row.getAttribute('data-admin-first-name'));
@@ -1006,6 +1051,7 @@ function populateUserEdit(row) {
     setFormValue('[data-admin-user-edit-field="status"]', row.getAttribute('data-admin-status'));
 }
 
+// Populateeventdetail
 function populateEventDetail(row) {
     activeAdminEventRow = row;
 
@@ -1050,6 +1096,7 @@ function populateEventDetail(row) {
     updateEventDetailActions(row);
 }
 
+// Updateeventdetailactions
 function updateEventDetailActions(row) {
     const eventId = row.getAttribute('data-admin-id');
     const status = row.getAttribute('data-admin-status') || '';
@@ -1072,6 +1119,7 @@ function updateEventDetailActions(row) {
     });
 }
 
+// Populateeventedit
 function populateEventEdit(row) {
     setFormValue('[data-admin-edit-field="event_id"]', row.getAttribute('data-admin-id'));
     setFormValue('[data-admin-edit-field="event_title"]', row.getAttribute('data-admin-name'));
@@ -1098,12 +1146,14 @@ function populateEventEdit(row) {
     setFormValue('[data-admin-edit-field="publish_time"]', row.getAttribute('data-admin-publish-time'));
 }
 
+// Showadminmessage
 function showAdminMessage(title, message) {
     setText('[data-admin-message-title]', title);
     setText('[data-admin-message-copy]', message);
     openModal(adminMessageModal);
 }
 
+// Appendapprovalhistory
 function appendApprovalHistory(action, detail) {
     if (!approvalHistory) {
         return;
@@ -1122,6 +1172,7 @@ function appendApprovalHistory(action, detail) {
     approvalHistory.prepend(item);
 }
 
+// Updatereviewpanel
 function updateReviewPanel(button) {
     if (!button) {
         return;
@@ -1160,6 +1211,7 @@ function updateReviewPanel(button) {
     appendApprovalHistory('Opened Review', `${title} selected for review.`);
 }
 
+// Setbannerpreview
 function setBannerPreview(src) {
     eventWizardState.bannerSrc = src;
 
@@ -1182,6 +1234,7 @@ function setBannerPreview(src) {
     }
 }
 
+// Handlebannerfile
 function handleBannerFile(file) {
     if (!file) {
         return;
@@ -1205,12 +1258,14 @@ function handleBannerFile(file) {
     reader.readAsDataURL(file);
 }
 
+// Focusfirstmodalcontrol
 function focusFirstModalControl(modal) {
     const focusableElement = modal?.querySelector('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled])');
 
     focusableElement?.focus();
 }
 
+// Openmodal
 function openModal(modal) {
     if (!modal) {
         return;
@@ -1227,6 +1282,7 @@ function openModal(modal) {
     });
 }
 
+// Openauthrequiredmodal
 function openAuthRequiredModal(message, title = 'Please sign in first') {
     if (authRequiredTitle) {
         authRequiredTitle.textContent = title;
@@ -1239,18 +1295,21 @@ function openAuthRequiredModal(message, title = 'Please sign in first') {
     openModal(authRequiredModal);
 }
 
+// Getlandingscrolloffset
 function getLandingScrollOffset() {
     const headerHeight = document.querySelector('.site-header')?.getBoundingClientRect().height || 72;
 
     return headerHeight + 18;
 }
 
+// Issectioncurrentlyactive
 function isSectionCurrentlyActive(section, offset) {
     const rect = section.getBoundingClientRect();
 
     return rect.top <= offset + 8 && rect.bottom > offset + 8;
 }
 
+// Scrolltolandingeventssection
 function scrollToLandingEventsSection() {
     if (!landingEventsSection) {
         return;
@@ -1275,6 +1334,7 @@ function scrollToLandingEventsSection() {
     });
 }
 
+// Resetregistrationmodal
 function resetRegistrationModal() {
     if (registrationForm) {
         registrationForm.reset();
@@ -1310,6 +1370,7 @@ function resetRegistrationModal() {
     }
 }
 
+// Closemodal
 function closeModal(modal) {
     if (!modal) {
         return;
@@ -1339,12 +1400,14 @@ function closeModal(modal) {
     }
 }
 
+// Closeactivemodal
 function closeActiveModal() {
     if (activeModal) {
         closeModal(activeModal);
     }
 }
 
+// Spliteventdatetime
 function splitEventDateTime(dateTimeText) {
     const parts = dateTimeText.split(' - ');
     const date = parts[0]?.trim();
@@ -1356,6 +1419,7 @@ function splitEventDateTime(dateTimeText) {
     };
 }
 
+// Getregistrationeventdetails
 function getRegistrationEventDetails(button) {
     const card = button.closest('[data-registration-event], .event-card');
     const dateTimeText = card?.getAttribute('data-event-date-time')
@@ -1381,6 +1445,7 @@ function getRegistrationEventDetails(button) {
     };
 }
 
+// Populateregistrationmodal
 function populateRegistrationModal(button) {
     const details = getRegistrationEventDetails(button);
 
@@ -1561,6 +1626,7 @@ privateEventOpenButtons.forEach((button) => {
     });
 });
 
+// Attendance Key Toggle Listener
 document.querySelectorAll('[data-attendance-toggle]').forEach((button) => {
     button.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -1570,7 +1636,7 @@ document.querySelectorAll('[data-attendance-toggle]').forEach((button) => {
         button.setAttribute('aria-pressed', isVisible ? 'false' : 'true');
 
         if (value) {
-            value.textContent = isVisible ? 'â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢' : (button.dataset.attendanceCode || 'No code');
+            value.textContent = isVisible ? '••••••••••••' : (button.dataset.attendanceCode || 'No code');
         }
     });
 });
@@ -1823,7 +1889,6 @@ if (bannerDropzone) {
     });
 }
 
-// Page Interaction Bootstrap
 document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
         closeActiveModal();
@@ -1842,7 +1907,6 @@ locationModeButtons.forEach((button) => {
 
         if (button.hasAttribute('data-location-filter')) {
             activeLocationFilter = button.getAttribute('data-location-filter') || 'all';
-// Filtering Interaction Logic
             filterEvents();
         }
 
@@ -1920,6 +1984,7 @@ locationChoiceButtons.forEach((button) => {
     });
 });
 
+// Event Filter Listeners
 filterButtons.forEach((button) => {
     button.addEventListener('click', () => {
         activeEventFilter = button.getAttribute('data-filter');
@@ -1950,6 +2015,7 @@ dashboardFilterButtons.forEach((button) => {
     });
 });
 
+// Admin Filter Listeners
 adminFilterButtons.forEach((button) => {
     button.addEventListener('click', () => {
         activeAdminFilter = button.getAttribute('data-admin-filter') || 'all';
@@ -2155,7 +2221,3 @@ document.addEventListener('click', (event) => {
         profileToggle?.setAttribute('aria-expanded', 'false');
     }
 });
-
-
-
-

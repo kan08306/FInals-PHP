@@ -1,9 +1,10 @@
 <?php
-// Administrator Page Setup
+// Admin Dashboard Page Setup
 $page_title = 'Shenanovents | Admin Dashboard';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-dashboard-data.php';
 
@@ -52,10 +53,11 @@ $summary_cards = [
     ],
 ];
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="adminDashboardTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -171,5 +173,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

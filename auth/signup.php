@@ -1,11 +1,12 @@
 <?php
-// Authentication Page Setup
+// Sign Up Page Setup
+// Shared Dependencies
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../database/connection.php';
 
+// Authenticated User Redirect
 if (is_user_logged_in()) {
     if (($_SESSION['user_role'] ?? '') === 'admin') {
-// Redirect Handling
         header('Location: ../admin/admin-dashboard.php');
         exit;
     }
@@ -30,7 +31,7 @@ $security_questions = [
     'What is your favorite food?',
 ];
 
-// Form Submission Handling
+// Form Processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $first_name = trim($_POST['first_name'] ?? '');
     $last_name = trim($_POST['last_name'] ?? '');
@@ -162,7 +163,9 @@ $safe_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
             </div>
         </aside>
 
+        <!-- Main Content -->
         <main class="signup-right">
+            <!-- Main Section -->
             <section class="signup-form-shell" aria-labelledby="signupFormTitle">
                 <h2 id="signupFormTitle">Sign up Account</h2>
                 <p class="signup-subtitle">Enter your personal data to create your account.</p>
@@ -177,6 +180,7 @@ $safe_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
                     </div>
                 <?php endif; ?>
 
+                <!-- Form -->
                 <form action="signup.php" method="post" class="signup-form">
                     <div class="signup-name-row">
                         <div class="signup-field">
@@ -255,7 +259,3 @@ $safe_email = htmlspecialchars($email, ENT_QUOTES, 'UTF-8');
     <script src="../assets/js/main.js?v=<?php echo $safe_asset_version; ?>"></script>
 </body>
 </html>
-
-
-
-

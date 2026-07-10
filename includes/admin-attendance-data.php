@@ -1,10 +1,11 @@
 <?php
-// Shared Include Setup
+// Admin Attendance Management Helpers
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 require_once __DIR__ . '/admin-registration-data.php';
 
-// A Dm In A Tt En Da Nc E S Ta Tu S O Pt Io Ns
+// Attendance Status Options
 function admin_attendance_status_options()
 {
     return [
@@ -13,7 +14,7 @@ function admin_attendance_status_options()
     ];
 }
 
-// A Dm In A Tt En Da Nc E F Il Te R O Pt Io Ns
+// Attendance Filter Options
 function admin_attendance_filter_options()
 {
     return [
@@ -24,13 +25,13 @@ function admin_attendance_filter_options()
     ];
 }
 
-// A Dm In A Tt En Da Nc E F La Sh
+// Attendance Flash
 function admin_attendance_flash($type, $message)
 {
     $_SESSION['admin_attendance_' . $type] = $message;
 }
 
-// A Dm In A Tt En Da Nc E G Et F La Sh
+// Attendance Get Flash
 function admin_attendance_get_flash($type)
 {
     $key = 'admin_attendance_' . $type;
@@ -40,13 +41,13 @@ function admin_attendance_get_flash($type)
     return $message;
 }
 
-// A Dm In A Tt En Da Nc E L Ab El
+// Attendance Label
 function admin_attendance_label($value)
 {
     return admin_registration_label($value);
 }
 
-// A Dm In A Tt En Da Nc E F Or Ma T D At Et Im E
+// Attendance Format Datetime
 function admin_attendance_format_datetime($date_time)
 {
     $timestamp = strtotime((string) $date_time);
@@ -54,13 +55,13 @@ function admin_attendance_format_datetime($date_time)
     return $timestamp ? date('m/d/Y g:i A', $timestamp) : 'N/A';
 }
 
-// A Dm In A Tt En Da Nc E C Ou Nt
+// Attendance Count
 function admin_attendance_count($conn, $sql)
 {
     return admin_registration_count($conn, $sql);
 }
 
-// A Dm In A Tt En Da Nc E F Et Ch S Um Ma Ry
+// Attendance Fetch Summary
 function admin_attendance_fetch_summary($conn, $event_id = 0)
 {
     $event_id = (int) $event_id;
@@ -75,7 +76,7 @@ function admin_attendance_fetch_summary($conn, $event_id = 0)
     ];
 }
 
-// A Dm In A Tt En Da Nc E F Il Te R C La Us E
+// Attendance Filter Clause
 function admin_attendance_filter_clause($conn, $attendance_filter)
 {
     $attendance_filter = strtolower(trim((string) $attendance_filter));
@@ -91,7 +92,7 @@ function admin_attendance_filter_clause($conn, $attendance_filter)
     return '';
 }
 
-// A Dm In A Tt En Da Nc E F Et Ch P Ar Ti Ci Pa Nt S
+// Attendance Fetch Participants
 function admin_attendance_fetch_participants($conn, $event_id = 0, $attendance_filter = 'all')
 {
     $event_id = (int) $event_id;
@@ -151,7 +152,7 @@ function admin_attendance_fetch_participants($conn, $event_id = 0, $attendance_f
     return $participants;
 }
 
-// A Dm In A Tt En Da Nc E F Et Ch R Ec Or Ds
+// Attendance Fetch Records
 function admin_attendance_fetch_records($conn, $event_id = 0, $attendance_filter = 'all')
 {
     $event_id = (int) $event_id;
@@ -205,7 +206,7 @@ function admin_attendance_fetch_records($conn, $event_id = 0, $attendance_filter
     return $records;
 }
 
-// A Dm In A Tt En Da Nc E S Yn C R Ec Or D
+// Attendance Sync Record
 function admin_attendance_sync_record($conn, $registration_id, $attendance_status, $admin_id)
 {
     $status_label = admin_attendance_label($attendance_status);
@@ -215,7 +216,6 @@ function admin_attendance_sync_record($conn, $registration_id, $attendance_statu
                 attendance_status = VALUES(attendance_status),
                 marked_by = VALUES(marked_by),
                 marked_at = CURRENT_TIMESTAMP';
-// Prepared Statement Setup
     $stmt = mysqli_prepare($conn, $sql);
 
     if (!$stmt) {
@@ -229,7 +229,7 @@ function admin_attendance_sync_record($conn, $registration_id, $attendance_statu
     return $success;
 }
 
-// A Dm In A Tt En Da Nc E M Ar K R Eg Is Tr At Io N
+// Attendance Mark Registration
 function admin_attendance_mark_registration($conn, $registration_id, $attendance_status, $admin_id)
 {
     $registration_id = (int) $registration_id;
@@ -298,10 +298,9 @@ function admin_attendance_mark_registration($conn, $registration_id, $attendance
     ];
 }
 
-// A Dm In A Tt En Da Nc E H An Dl E P Os T
+// Attendance Handle Post
 function admin_attendance_handle_post($conn, $redirect_path)
 {
-// Form Submission Handling
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['admin_attendance_action'])) {
         return;
     }
@@ -317,12 +316,6 @@ function admin_attendance_handle_post($conn, $redirect_path)
     }
 
     admin_attendance_flash($result['success'] ? 'success' : 'error', $result['message']);
-// Redirect Handling
     header('Location: ' . $redirect_path);
     exit;
 }
-
-
-
-
-

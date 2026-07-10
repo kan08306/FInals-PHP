@@ -1,12 +1,14 @@
 <?php
-// Participant Page Setup
+// City Events Page Setup
 $current_page = 'events';
 $base_path = '../';
 $asset_version = 'participant-module-update';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
+// Registration Management
 participant_handle_registration_post($conn);
 
 $requested_city = trim($_GET['city'] ?? 'Manila');
@@ -24,6 +26,7 @@ $event_filters = participant_normalize_event_filters([
 ]);
 $all_events = participant_fetch_events($conn, $participant_id, $event_filters);
 $pagination = participant_paginate_items($all_events, participant_current_page(), 8);
+// Page Data Retrieval
 $events = $pagination['items'];
 $success_message = participant_get_flash('success');
 $error_message = participant_get_flash('error');
@@ -39,10 +42,11 @@ if (!in_array($selected_city, $popular_cities, true)) {
 }
 
 require_once __DIR__ . '/../includes/countries.php';
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="page-section listings-section city-events-section" aria-labelledby="listingsTitle">
     <div class="explore-events-header">
         <h1 id="listingsTitle">Explore Events in <?php echo htmlspecialchars($selected_city, ENT_QUOTES, 'UTF-8'); ?></h1>
@@ -114,5 +118,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

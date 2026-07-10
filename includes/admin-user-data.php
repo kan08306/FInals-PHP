@@ -1,27 +1,28 @@
 <?php
-// Shared Include Setup
+// Admin User Management Helpers
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 
-// A Dm In U Se R A Ll Ow Ed S Ta Tu Se S
+// User Allowed Statuses
 function admin_user_allowed_statuses()
 {
     return ['active', 'suspended', 'inactive'];
 }
 
-// A Dm In U Se R A Ll Ow Ed R Ol Es
+// User Allowed Roles
 function admin_user_allowed_roles()
 {
     return ['admin', 'participant'];
 }
 
-// A Dm In U Se R F La Sh
+// User Flash
 function admin_user_flash($type, $message)
 {
     $_SESSION['admin_user_' . $type] = $message;
 }
 
-// A Dm In U Se R G Et F La Sh
+// User Get Flash
 function admin_user_get_flash($type)
 {
     $key = 'admin_user_' . $type;
@@ -31,7 +32,7 @@ function admin_user_get_flash($type)
     return $message;
 }
 
-// A Dm In U Se R L Ab El
+// User Label
 function admin_user_label($value)
 {
     $value = trim((string) $value);
@@ -43,7 +44,7 @@ function admin_user_label($value)
     return ucwords(str_replace(['_', '-'], ' ', strtolower($value)));
 }
 
-// A Dm In U Se R F Or Ma T D At E
+// User Format Date
 function admin_user_format_date($date)
 {
     $timestamp = strtotime((string) $date);
@@ -51,7 +52,7 @@ function admin_user_format_date($date)
     return $timestamp ? date('m/d/Y', $timestamp) : 'N/A';
 }
 
-// A Dm In U Se R I Ni Ti Al S
+// User Initials
 function admin_user_initials($first_name, $last_name, $email = '')
 {
     $first_name = trim((string) $first_name);
@@ -74,7 +75,7 @@ function admin_user_initials($first_name, $last_name, $email = '')
     return $initials !== '' ? $initials : 'U';
 }
 
-// A Dm In U Se R P Ro Fi Le S Rc
+// User Profile Src
 function admin_user_profile_src($profile_picture, $base_path = '../')
 {
     $profile_picture = trim((string) $profile_picture);
@@ -86,7 +87,7 @@ function admin_user_profile_src($profile_picture, $base_path = '../')
     return $base_path . ltrim($profile_picture, '/');
 }
 
-// A Dm In U Se R F Et Ch U Se Rs
+// User Fetch Users
 function admin_user_fetch_users($conn)
 {
     $users = [];
@@ -126,7 +127,7 @@ function admin_user_fetch_users($conn)
     return $users;
 }
 
-// A Dm In U Se R F Et Ch U Se R B Y I D
+// User Fetch User By ID
 function admin_user_fetch_user_by_id($conn, $user_id)
 {
     $user_id = (int) $user_id;
@@ -134,7 +135,6 @@ function admin_user_fetch_user_by_id($conn, $user_id)
             FROM users
             WHERE user_id = ?
             LIMIT 1';
-// Prepared Statement Setup
     $stmt = mysqli_prepare($conn, $sql);
 
     if (!$stmt) {
@@ -150,7 +150,7 @@ function admin_user_fetch_user_by_id($conn, $user_id)
     return $user ?: null;
 }
 
-// A Dm In U Se R E Ma Il E Xi St S
+// User Email Exists
 function admin_user_email_exists($conn, $email, $except_user_id)
 {
     $except_user_id = (int) $except_user_id;
@@ -174,7 +174,7 @@ function admin_user_email_exists($conn, $email, $except_user_id)
     return $exists;
 }
 
-// A Dm In U Se R U Pd At E U Se R
+// User Update User
 function admin_user_update_user($conn, $form_data, $current_admin_id)
 {
     $user_id = (int) ($form_data['user_id'] ?? ($form_data['target_user_id'] ?? 0));
@@ -248,7 +248,7 @@ function admin_user_update_user($conn, $form_data, $current_admin_id)
     return ['success' => true, 'message' => 'User information updated successfully.'];
 }
 
-// A Dm In U Se R U Pd At E S Ta Tu S
+// User Update Status
 function admin_user_update_status($conn, $user_id, $status, $current_admin_id)
 {
     $user_id = (int) $user_id;
@@ -290,19 +290,19 @@ function admin_user_update_status($conn, $user_id, $status, $current_admin_id)
     return ['success' => true, 'message' => 'User status updated to ' . admin_user_label($status) . '.'];
 }
 
-// A Dm In U Se R S Us Pe Nd U Se R
+// User Suspend User
 function admin_user_suspend_user($conn, $user_id, $current_admin_id)
 {
     return admin_user_update_status($conn, $user_id, 'suspended', $current_admin_id);
 }
 
-// A Dm In U Se R R Ea Ct Iv At E U Se R
+// User Reactivate User
 function admin_user_reactivate_user($conn, $user_id, $current_admin_id)
 {
     return admin_user_update_status($conn, $user_id, 'active', $current_admin_id);
 }
 
-// A Dm In U Se R S Af E D El Et E U Se R
+// User Safe Delete User
 function admin_user_safe_delete_user($conn, $user_id, $current_admin_id)
 {
     $result = admin_user_update_status($conn, $user_id, 'inactive', $current_admin_id);
@@ -314,10 +314,9 @@ function admin_user_safe_delete_user($conn, $user_id, $current_admin_id)
     return $result;
 }
 
-// A Dm In U Se R H An Dl E P Os T
+// User Handle Post
 function admin_user_handle_post($conn, $redirect_path)
 {
-// Form Submission Handling
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['admin_user_action'])) {
         return;
     }
@@ -338,12 +337,6 @@ function admin_user_handle_post($conn, $redirect_path)
     }
 
     admin_user_flash($result['success'] ? 'success' : 'error', $result['message']);
-// Redirect Handling
     header('Location: ' . $redirect_path);
     exit;
 }
-
-
-
-
-

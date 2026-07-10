@@ -1,5 +1,5 @@
 <?php
-// Public Page Setup
+// Help Center Page Setup
 $page_title = 'Shenanovents | Help Center';
 $current_page = 'home';
 $info_kicker = 'Resources';
@@ -18,6 +18,5 @@ $info_sections = [
 ];
 $info_cta = ['title' => 'Need direct assistance?', 'body' => 'Send a support request with your concern and account details.', 'label' => 'Contact Support', 'href' => 'contact-support.php'];
 
+// Shared Dependencies
 require_once 'includes/info-page-template.php';
-
-

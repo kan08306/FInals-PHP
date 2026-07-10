@@ -1,5 +1,5 @@
-<?php
-// Forgot Password Page Setup
+﻿<?php
+// Authentication Page Setup
 // Shared Dependencies
 require_once __DIR__ . '/../includes/session.php';
 require_once __DIR__ . '/../database/connection.php';
@@ -9,6 +9,7 @@ if (isset($_GET['restart'])) {
     unset($_SESSION['password_reset_email']);
     unset($_SESSION['password_reset_question']);
     unset($_SESSION['password_reset_verified']);
+// Redirect Handling
     header('Location: forgot-password.php');
     exit;
 }
@@ -31,6 +32,7 @@ $email = '';
 $security_question = '';
 $step = 'email';
 
+// Form Submission Handling
 // Form Processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'check_email';
@@ -46,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($forgot_errors)) {
             $sql = 'SELECT user_id, security_question, security_answer FROM users WHERE email = ? LIMIT 1';
+// Prepared Statement Setup
             $stmt = mysqli_prepare($conn, $sql);
 
             if ($stmt) {

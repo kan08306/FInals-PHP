@@ -1,9 +1,10 @@
 <?php
-// Administrator Page Setup
+// Admin Reports Page Setup
 $page_title = 'Shenanovents | Reports';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-report-data.php';
 
@@ -24,12 +25,14 @@ $event_options = admin_registration_fetch_event_options($conn);
 $platform_summary = admin_report_fetch_platform_summary($conn);
 $participation_report = admin_report_fetch_event_participation($conn, $event_filter, $date_filter);
 $attendance_summary = admin_report_fetch_attendance_summary($conn, $event_filter, $date_filter);
+// Page Data Retrieval
 $attendance_records = admin_report_fetch_attendance_records($conn, $event_filter, $date_filter, $attendance_filter);
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="reportsTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -64,6 +67,7 @@ require_once __DIR__ . '/../includes/header.php';
             </article>
         </div>
 
+        <!-- Form -->
         <form class="admin-toolbar admin-filter-form" method="get" action="admin-reports.php">
             <label class="admin-filter-field">
                 <span>Event</span>
@@ -107,6 +111,7 @@ require_once __DIR__ . '/../includes/header.php';
         </div>
 
         <div class="dashboard-table-card">
+            <!-- Data Table -->
             <table class="dashboard-event-table admin-table">
                 <thead>
                     <tr>
@@ -238,5 +243,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

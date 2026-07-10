@@ -1,13 +1,15 @@
 <?php
-// Participant Page Setup
+// Event Details Page Setup
 $page_title = 'Shenanovents | Event Details';
 $current_page = 'events';
 $base_path = '../';
 $asset_version = 'phase6-event-details';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
+// Registration Management
 participant_handle_registration_post($conn);
 
 $participant_id = participant_current_user_id();
@@ -20,10 +22,11 @@ if ($event) {
     $page_title = 'Shenanovents | ' . $event['event_title'];
 }
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="profile-page event-detail-page" aria-labelledby="eventDetailTitle">
     <div class="profile-shell">
         <div class="dashboard-title-row">
@@ -107,5 +110,3 @@ require_once __DIR__ . '/../includes/header.php';
 </section>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

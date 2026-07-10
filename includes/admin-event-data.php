@@ -1,15 +1,16 @@
 <?php
-// Shared Include Setup
+// Admin Event Management Helpers
+// Shared Dependencies
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../database/connection.php';
 
-// A Dm In E Ve Nt A Ll Ow Ed S Ta Tu Se S
+// Event Allowed Statuses
 function admin_event_allowed_statuses()
 {
     return ['pending', 'open', 'approved', 'published', 'rejected', 'closed', 'cancelled'];
 }
 
-// A Dm In E Ve Nt S Ta Tu S O Pt Io Ns
+// Event Status Options
 function admin_event_status_options()
 {
     return [
@@ -23,13 +24,13 @@ function admin_event_status_options()
     ];
 }
 
-// A Dm In E Ve Nt F La Sh
+// Event Flash
 function admin_event_flash($type, $message)
 {
     $_SESSION['admin_event_' . $type] = $message;
 }
 
-// A Dm In E Ve Nt G Et F La Sh
+// Event Get Flash
 function admin_event_get_flash($type)
 {
     $key = 'admin_event_' . $type;
@@ -39,7 +40,7 @@ function admin_event_get_flash($type)
     return $message;
 }
 
-// A Dm In E Ve Nt S Ta Tu S L Ab El
+// Event Status Label
 function admin_event_status_label($status)
 {
     $status = trim((string) $status);
@@ -51,7 +52,7 @@ function admin_event_status_label($status)
     return ucwords(str_replace(['_', '-'], ' ', strtolower($status)));
 }
 
-// A Dm In E Ve Nt F Or Ma T D At E
+// Event Format Date
 function admin_event_format_date($date)
 {
     $timestamp = strtotime((string) $date);
@@ -59,7 +60,7 @@ function admin_event_format_date($date)
     return $timestamp ? date('m/d/Y', $timestamp) : 'N/A';
 }
 
-// A Dm In E Ve Nt F Or Ma T T Im E
+// Event Format Time
 function admin_event_format_time($time)
 {
     $timestamp = strtotime((string) $time);
@@ -67,7 +68,7 @@ function admin_event_format_time($time)
     return $timestamp ? date('g:i A', $timestamp) : 'N/A';
 }
 
-// A Dm In E Ve Nt F Or Ma T T Im E R An Ge
+// Event Format Time Range
 function admin_event_format_time_range($start_time, $end_time)
 {
     $start = admin_event_format_time($start_time);
@@ -80,7 +81,7 @@ function admin_event_format_time_range($start_time, $end_time)
     return $end === 'N/A' ? $start : $start . ' - ' . $end;
 }
 
-// A Dm In E Ve Nt P Ub Li Sh L Ab El
+// Event Publish Label
 function admin_event_publish_label($event)
 {
     $publish_date = trim((string) ($event['publish_date'] ?? ''));
@@ -99,7 +100,7 @@ function admin_event_publish_label($event)
     return $label;
 }
 
-// A Dm In E Ve Nt B An Ne R S Rc
+// Event Banner Src
 function admin_event_banner_src($event, $base_path = '../')
 {
     $banner_image = trim((string) ($event['banner_image'] ?? ''));
@@ -111,7 +112,7 @@ function admin_event_banner_src($event, $base_path = '../')
     return $base_path . 'assets/images/events/hero-event.png';
 }
 
-// A Dm In E Ve Nt L Oc At Io N L Ab El
+// Event Location Label
 function admin_event_location_label($event)
 {
     $event_type = strtolower(trim((string) ($event['event_type'] ?? '')));
@@ -143,13 +144,13 @@ function admin_event_location_label($event)
     return $event['event_location'] ?? 'N/A';
 }
 
-// A Dm In E Ve Nt R Eg Is Tr At Io N L Ab El
+// Event Registration Label
 function admin_event_registration_label($event)
 {
     return (int) ($event['registered_count'] ?? 0) . ' / ' . (int) ($event['capacity'] ?? 0);
 }
 
-// A Dm In E Ve Nt F Et Ch E Ve Nt S
+// Event Fetch Events
 function admin_event_fetch_events($conn, $status_filter = '')
 {
     $events = [];
@@ -182,7 +183,6 @@ function admin_event_fetch_events($conn, $status_filter = '')
                 e.event_date ASC,
                 e.event_time ASC';
 
-// Prepared Statement Setup
     $stmt = mysqli_prepare($conn, $sql);
 
     if (!$stmt) {
@@ -207,7 +207,7 @@ function admin_event_fetch_events($conn, $status_filter = '')
     return $events;
 }
 
-// A Dm In E Ve Nt F Et Ch E Ve Nt B Y I D
+// Event Fetch Event By ID
 function admin_event_fetch_event_by_id($conn, $event_id)
 {
     $events = admin_event_fetch_events($conn);
@@ -221,7 +221,7 @@ function admin_event_fetch_event_by_id($conn, $event_id)
     return null;
 }
 
-// A Dm In E Ve Nt F Et Ch R Ec En T A Ct Iv It Y
+// Event Fetch Recent Activity
 function admin_event_fetch_recent_activity($conn, $limit = 5)
 {
     $limit = max(1, min(10, (int) $limit));
@@ -246,7 +246,7 @@ function admin_event_fetch_recent_activity($conn, $limit = 5)
     return $events;
 }
 
-// A Dm In E Ve Nt U Pd At E S Ta Tu S
+// Event Update Status
 function admin_event_update_status($conn, $event_id, $status)
 {
     $event_id = (int) $event_id;
@@ -282,7 +282,7 @@ function admin_event_update_status($conn, $event_id, $status)
     return ['success' => true, 'message' => 'Event status updated to ' . admin_event_status_label($status) . '.'];
 }
 
-// A Dm In E Ve Nt A Pp Ro Ve A Nd P Ub Li Sh
+// Event Approve And Publish
 function admin_event_approve_and_publish($conn, $event_id)
 {
     $result = admin_event_update_status($conn, $event_id, 'published');
@@ -294,7 +294,7 @@ function admin_event_approve_and_publish($conn, $event_id)
     return $result;
 }
 
-// A Dm In E Ve Nt R Ej Ec T A Nd C Lo Se
+// Event Reject And Close
 function admin_event_reject_and_close($conn, $event_id)
 {
     $result = admin_event_update_status($conn, $event_id, 'rejected');
@@ -306,7 +306,7 @@ function admin_event_reject_and_close($conn, $event_id)
     return $result;
 }
 
-// A Dm In E Ve Nt N Or Ma Li Ze D At E
+// Event Normalize Date
 function admin_event_normalize_date($value, $required = true)
 {
     $value = trim((string) $value);
@@ -320,7 +320,7 @@ function admin_event_normalize_date($value, $required = true)
     return $timestamp ? date('Y-m-d', $timestamp) : '';
 }
 
-// A Dm In E Ve Nt N Or Ma Li Ze T Im E
+// Event Normalize Time
 function admin_event_normalize_time($value, $required = true)
 {
     $value = trim((string) $value);
@@ -336,7 +336,7 @@ function admin_event_normalize_time($value, $required = true)
     return strlen($value) === 5 ? $value . ':00' : $value;
 }
 
-// A Dm In E Ve Nt C Le An O Pt Io Na L
+// Event Clean Optional
 function admin_event_clean_optional($value)
 {
     $value = trim((string) $value);
@@ -344,7 +344,7 @@ function admin_event_clean_optional($value)
     return $value === '' ? null : $value;
 }
 
-// A Dm In E Ve Nt U Pd At E E Ve Nt
+// Event Update Event
 function admin_event_update_event($conn, $form_data)
 {
     $event_id = (int) ($form_data['event_id'] ?? 0);
@@ -486,7 +486,7 @@ function admin_event_update_event($conn, $form_data)
     return ['success' => true, 'message' => 'Event information updated successfully.'];
 }
 
-// A Dm In E Ve Nt D El Et E U Pl Oa De D B An Ne R
+// Event Delete Uploaded Banner
 function admin_event_delete_uploaded_banner($banner_path)
 {
     $banner_path = trim((string) $banner_path);
@@ -503,7 +503,7 @@ function admin_event_delete_uploaded_banner($banner_path)
     }
 }
 
-// A Dm In E Ve Nt P Er Ma Ne Nt Ly D El Et E E Ve Nt
+// Event Permanently Delete Event
 function admin_event_permanently_delete_event($conn, $event_id)
 {
     $event_id = (int) $event_id;
@@ -541,10 +541,9 @@ function admin_event_permanently_delete_event($conn, $event_id)
     ];
 }
 
-// A Dm In E Ve Nt H An Dl E P Os T
+// Event Handle Post
 function admin_event_handle_post($conn, $redirect_path)
 {
-// Form Submission Handling
     if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['admin_event_action'])) {
         return;
     }
@@ -576,12 +575,6 @@ function admin_event_handle_post($conn, $redirect_path)
     }
 
     admin_event_flash($result['success'] ? 'success' : 'error', $result['message']);
-// Redirect Handling
     header('Location: ' . $redirect_path);
     exit;
 }
-
-
-
-
-

@@ -1,12 +1,14 @@
 <?php
-// Administrator Page Setup
+// Admin Approval Queue Page Setup
 $page_title = 'Shenanovents | Event Approvals';
 $current_page = 'admin';
 $base_path = '../';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/admin-check.php';
 require_once __DIR__ . '/../includes/admin-event-data.php';
 
+// Event Management Form Processing
 admin_event_handle_post($conn, 'admin-approvals.php');
 
 $submitted_events = admin_event_fetch_events($conn, 'pending');
@@ -15,10 +17,11 @@ $first_event = $submitted_events[0] ?? null;
 $success_message = admin_event_get_flash('success');
 $error_message = admin_event_get_flash('error');
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="admin-page" aria-labelledby="approvalsTitle">
     <div class="admin-section">
         <div class="dashboard-title-row">
@@ -121,6 +124,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <div><span>Additional Details</span><strong data-review-details><?php echo htmlspecialchars($first_event['event_summary'] ?? $first_event['event_tags'] ?? 'No additional details.', ENT_QUOTES, 'UTF-8'); ?></strong></div>
                         </div>
 
+                        <!-- Form -->
                         <form class="admin-review-actions" action="admin-approvals.php" method="post">
                             <input type="hidden" name="event_id" value="<?php echo (int) $first_event['event_id']; ?>" data-review-event-id>
                             <button class="button button-primary" type="submit" name="admin_event_action" value="approve_publish_event">Approve</button>
@@ -187,5 +191,3 @@ require_once __DIR__ . '/../includes/header.php';
 </div>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-

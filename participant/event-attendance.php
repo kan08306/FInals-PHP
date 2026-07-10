@@ -1,18 +1,19 @@
 <?php
-// Participant Page Setup
+// Event Attendance Page Setup
 $page_title = 'Shenanovents | Event Attendance';
 $current_page = 'dashboard';
 $base_path = '../';
 $body_class = 'event-dashboard-body';
 $asset_version = 'my-events-restore';
 
+// Shared Dependencies
 require_once __DIR__ . '/../includes/participant-check.php';
 require_once __DIR__ . '/../includes/participant-data.php';
 
 $participant_id = participant_current_user_id();
 $selected_event_id = (int) ($_GET['event'] ?? ($_POST['event_id'] ?? 0));
 
-// Form Submission Handling
+// Form Processing
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $event = $selected_event_id > 0 ? participant_fetch_owned_event_dashboard($conn, $participant_id, $selected_event_id) : null;
     $action = $_POST['attendance_action'] ?? '';
@@ -29,7 +30,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     participant_flash($result['success'] ? 'success' : 'error', $result['message']);
-// Redirect Handling
     header('Location: event-attendance.php?event=' . $selected_event_id);
     exit;
 }
@@ -46,11 +46,12 @@ $error_message = participant_get_flash('error');
 $status = $event ? strtolower($event['status']) : '';
 $status_class = $status === 'open' ? 'registered' : ($status === 'closed' ? 'cancelled' : $status);
 
-// Shared Layout Rendering
+// Page Header
 require_once __DIR__ . '/../includes/header.php';
 ?>
 
 <?php if (!$event): ?>
+    <!-- Main Section -->
     <section class="dashboard-page" aria-labelledby="eventAttendanceTitle">
         <div class="dashboard-section">
             <div class="dashboard-title-row">
@@ -150,6 +151,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span><?php echo htmlspecialchars(ucwords($event['status']), ENT_QUOTES, 'UTF-8'); ?></span>
                     </div>
 
+                    <!-- Form -->
                     <form class="attendance-code-form" method="post" action="event-attendance.php?event=<?php echo (int) $event['event_id']; ?>">
                         <input type="hidden" name="attendance_action" value="verify_code">
                         <input type="hidden" name="event_id" value="<?php echo (int) $event['event_id']; ?>">
@@ -175,6 +177,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <div class="dashboard-table-card">
+                    <!-- Data Table -->
                     <table class="dashboard-event-table admin-table event-attendance-table">
                         <thead>
                             <tr>
@@ -255,7 +258,3 @@ require_once __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
-
-
-
-

@@ -1,11 +1,13 @@
 <?php
-// Public Page Setup
+// Landing Page Setup
 $page_title = 'Shenanovents | Discover Events';
 $current_page = 'home';
 
+// Shared Dependencies
 require_once 'includes/participant-data.php';
 require_once 'includes/countries.php';
 
+// Page Data Retrieval
 $events = participant_fetch_landing_events($conn, 8);
 
 $destinations = [
@@ -33,10 +35,11 @@ $destinations = [
 
 $popular_cities = ['Manila', 'Quezon City', 'Pasig', 'Taguig'];
 
-// Shared Layout Rendering
+// Page Header
 require_once 'includes/header.php';
 ?>
 
+<!-- Main Section -->
 <section class="page-section hero-section" id="about" aria-labelledby="heroTitle">
     <div class="hero-content">
         <p class="eyebrow">Shenanovents</p>
@@ -156,5 +159,3 @@ require_once 'includes/header.php';
 </section>
 
 <?php require_once 'includes/footer.php'; ?>
-
-

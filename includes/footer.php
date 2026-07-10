@@ -1,5 +1,6 @@
     </main>
 
+    <!-- Footer -->
     <footer class="site-footer">
         <div class="footer-main">
             <div class="footer-brand">
@@ -41,6 +42,7 @@
     </footer>
 
     <div class="registration-modal-overlay" data-auth-required-modal aria-hidden="true" hidden>
+        <!-- Main Section -->
         <section class="registration-modal-card auth-required-card" role="dialog" aria-modal="true" aria-labelledby="authRequiredTitle">
             <button class="registration-modal-close" type="button" aria-label="Close popup" data-modal-close>&times;</button>
             <span class="registration-modal-accent" aria-hidden="true"></span>
@@ -54,10 +56,12 @@
         </section>
     </div>
 
+    <!-- Registration Modal -->
     <div class="registration-modal-overlay" data-registration-modal aria-hidden="true" hidden>
         <section class="registration-modal-card event-registration-card" role="dialog" aria-modal="true" aria-labelledby="registrationModalTitle">
             <button class="registration-modal-close" type="button" aria-label="Close registration form" data-modal-close>&times;</button>
 
+            <!-- Form -->
             <form class="event-registration-form" action="" method="post" data-registration-form>
                 <input type="hidden" name="participant_action" value="register_event">
                 <input type="hidden" name="event_id" value="" data-registration-event-id>
@@ -151,4 +155,3 @@
     <script src="<?php echo htmlspecialchars($base_path ?? '', ENT_QUOTES, 'UTF-8'); ?>assets/js/main.js?v=<?php echo htmlspecialchars($asset_version ?? 'frontend-standards', ENT_QUOTES, 'UTF-8'); ?>"></script>
 </body>
 </html>
-

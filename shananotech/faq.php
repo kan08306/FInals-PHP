@@ -1,5 +1,5 @@
-<?php
-// FAQ Page Setup
+﻿<?php
+// Public Page Setup
 $page_title = 'Shenanovents | FAQ';
 $current_page = 'home';
 $info_kicker = 'Resources';
